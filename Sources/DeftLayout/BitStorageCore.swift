@@ -38,6 +38,7 @@ class BitStorageCore {
         init(ofByte: Int, msb: Int, lsb: Int) {
             assert(ofByte > 0)
             assert(msb >= lsb)
+            assert(msb < 8)
             storage = BitStorageCore._storage
             index = ofByte - 1
             self.lsb = lsb
