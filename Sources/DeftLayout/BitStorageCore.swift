@@ -35,18 +35,29 @@ class BitStorageCore {
         let lsb: Int
         let mask: UInt8
 
-        init(ofByte: Int, msb: Int, lsb: Int) {
-            assert(ofByte > 0)
-            assert(msb >= lsb)
-            assert(msb < 8)
+        init(ofByte: Int, checkingMsb msb: Int, checkingLsb lsb: Int) throws {
+            enum RangeError: Error {
+                case badByteIndex
+                case bitOrdering
+                case byteWidthExceeded
+            }
+
+            guard ofByte > 0 else { throw RangeError.badByteIndex }
+            guard msb >= lsb else { throw RangeError.bitOrdering }
+            guard msb < 8 else { throw RangeError.byteWidthExceeded }
+            guard lsb >= 0 else { throw RangeError.byteWidthExceeded }
             storage = BitStorageCore._storage
             index = ofByte - 1
             self.lsb = lsb
             mask = UInt8((0b10 << (msb - lsb)) - 1)
         }
 
+        convenience init(ofByte: Int, msb: Int, lsb: Int) {
+            try! self.init(ofByte: ofByte, checkingMsb: msb, checkingLsb: lsb)
+        }
+
         convenience init(ofByte: Int, bit: Int) {
-            self.init(ofByte: ofByte, msb: bit, lsb: bit)
+            try! self.init(ofByte: ofByte, checkingMsb: bit, checkingLsb: bit)
         }
 
         var byte: UInt8 {
