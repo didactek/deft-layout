@@ -36,7 +36,7 @@ class BitStorageSignedTests: XCTestCase {
     }
 
     func testSignRepresentationAndMask() throws {
-        let minusThree: SmallSigned = 0b1111_1011
+        let minusThree: SmallSigned = -3
         // msb edge
         coder.storage.bytes[0] = 0
         coder.highNibble = minusThree // FIXME: all -3 when type allows it
@@ -67,8 +67,8 @@ class BitStorageSignedTests: XCTestCase {
     }
 
     func testSignExtension() {
-        coder.sixBits = 0b1111_1100
-        XCTAssertEqual(coder.sixBits, 0b1111_1100, "top two bits should be sign-extended")
+        coder.sixBits = -4
+        XCTAssertEqual(coder.sixBits, -4, "top two bits should be sign-extended")
 
         coder.sixBits = 29
         XCTAssertEqual(coder.sixBits, 29, "no sign extension for positive values")
