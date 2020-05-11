@@ -10,12 +10,6 @@
 
 import Foundation
 
-extension RawRepresentable {
-    static func requiresSignExtension() -> Bool {
-        return false
-    }
-}
-
 protocol ByteCoder {
     var byte: UInt8 { get set }
 }
@@ -167,10 +161,6 @@ extension UInt8: RawRepresentable {
 
 extension Int8: RawRepresentable {
     public typealias RawValue = UInt8
-
-    static func requiresSignExtension() -> Bool {
-        return true
-    }
 
     public init?(rawValue: RawValue) {
         self = Self(bitPattern: rawValue)
