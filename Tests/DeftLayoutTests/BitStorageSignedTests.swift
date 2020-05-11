@@ -10,7 +10,7 @@
 import XCTest
 
 class BitStorageSignedTests: XCTestCase {
-    typealias SmallSigned = Int8 // Start with unsigned for TDD
+    typealias SmallSigned = Int8
 
     class SignedRange: BitStorageCore {
         @position(SubByte(ofByte: 1, msb: 7, lsb: 4, .extendNegativeBit))
@@ -36,7 +36,7 @@ class BitStorageSignedTests: XCTestCase {
     }
 
     func testSignRepresentationAndMask() throws {
-        let minusThree: SmallSigned = -3
+        let minusThree: SmallSigned = -3  // 1111_1101 in two's complement
         // msb edge
         coder.storage.bytes[0] = 0
         coder.highNibble = minusThree // FIXME: all -3 when type allows it
