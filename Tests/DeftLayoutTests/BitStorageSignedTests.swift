@@ -13,16 +13,16 @@ class BitStorageSignedTests: XCTestCase {
     typealias SmallSigned = Int8 // Start with unsigned for TDD
 
     class SignedRange: BitStorageCore {
-        @position(SubByte(ofByte: 1, msb: 7, lsb: 4))
+        @position(SubByte(ofByte: 1, msb: 7, lsb: 4, .extendNegativeBit))
         var highNibble: SmallSigned = 0
 
-        @position(SubByte(ofByte: 2, msb: 5, lsb: 1))
+        @position(SubByte(ofByte: 2, msb: 5, lsb: 2, .extendNegativeBit))
         var midNibble: SmallSigned = 0
 
-        @position(SubByte(ofByte: 3, msb: 4, lsb: 0))
+        @position(SubByte(ofByte: 3, msb: 3, lsb: 0, .extendNegativeBit))
         var lowNibble: SmallSigned = 0
 
-        @position(SubByte(ofByte: 4, msb: 6, lsb: 1))
+        @position(SubByte(ofByte: 4, msb: 6, lsb: 1, .extendNegativeBit))
         var sixBits: SmallSigned = 0
     }
     var coder = SignedRange()  // object under test
@@ -40,33 +40,33 @@ class BitStorageSignedTests: XCTestCase {
         // msb edge
         coder.storage.bytes[0] = 0
         coder.highNibble = minusThree // FIXME: all -3 when type allows it
-        XCTAssertEqual(coder.storage.bytes[0], 0b1011_0000, "two's complement, shifted four")
+        XCTAssertEqual(coder.storage.bytes[0], 0b1101_0000, "got: \(String(coder.storage.bytes[0], radix: 2))")
 
         coder.storage.bytes[0] = 0xff
         coder.highNibble = minusThree
-        XCTAssertEqual(coder.storage.bytes[0], 0b1011_1111, "two's complement, shifted four")
+        XCTAssertEqual(coder.storage.bytes[0], 0b1101_1111, "got: \(String(coder.storage.bytes[0], radix: 2))")
 
         // middle of the byte
         coder.storage.bytes[1] = 0
         coder.midNibble = minusThree
-        XCTAssertEqual(coder.storage.bytes[1], 0b00_1011_00, "two's complement, shifted two")
+        XCTAssertEqual(coder.storage.bytes[1], 0b00_1101_00, "got: \(String(coder.storage.bytes[1], radix: 2))")
 
         coder.storage.bytes[1] = 0xff
         coder.midNibble = minusThree
-        XCTAssertEqual(coder.storage.bytes[1], 0b11_1011_11, "two's complement, shifted two")
+        XCTAssertEqual(coder.storage.bytes[1], 0b11_1101_11, "got: \(String(coder.storage.bytes[1], radix: 2))")
 
 
         // lsb edge
         coder.storage.bytes[2] = 0
         coder.lowNibble = minusThree
-        XCTAssertEqual(coder.storage.bytes[1], 0b0000_1011, "two's complement")
+        XCTAssertEqual(coder.storage.bytes[2], 0b0000_1101, "got: \(String(coder.storage.bytes[2], radix: 2))")
 
         coder.storage.bytes[2] = 0xff
         coder.lowNibble = minusThree
-        XCTAssertEqual(coder.storage.bytes[1], 0b1111_1011, "two's complement")
+        XCTAssertEqual(coder.storage.bytes[2], 0b1111_1101, "got: \(String(coder.storage.bytes[2], radix: 2))")
     }
 
-    func testSignExtension() {
+    func testSignExtension() throws {
         coder.sixBits = -4
         XCTAssertEqual(coder.sixBits, -4, "top two bits should be sign-extended")
 

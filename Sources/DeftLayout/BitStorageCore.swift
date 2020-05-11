@@ -39,15 +39,22 @@ class BitStorageCore {
         Self._storage = Storage()
     }
 
+    struct PositionOptions: OptionSet {
+        let rawValue: Int
+
+        static let extendNegativeBit = PositionOptions(rawValue: 1 << 0)
+    }
+
     class SubByte: ByteCoder {
         let storage: Storage
+        let options: PositionOptions
         let index: Int
         let msb: Int
         let lsb: Int
 
         let mask: UInt8
 
-        init(ofByte: Int, checkingMsb msb: Int, checkingLsb lsb: Int) throws {
+        init(ofByte: Int, checkingMsb msb: Int, checkingLsb lsb: Int, options: PositionOptions) throws {
             enum RangeError: Error {
                 case badByteIndex
                 case bitOrdering
@@ -64,14 +71,15 @@ class BitStorageCore {
             self.msb = msb
             self.lsb = lsb
             mask = UInt8((0b10 << (msb - lsb)) - 1)
+            self.options = options
         }
 
-        convenience init(ofByte: Int, msb: Int, lsb: Int) {
-            try! self.init(ofByte: ofByte, checkingMsb: msb, checkingLsb: lsb)
+        convenience init(ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
+            try! self.init(ofByte: ofByte, checkingMsb: msb, checkingLsb: lsb, options: options)
         }
 
         convenience init(ofByte: Int, bit: Int) {
-            try! self.init(ofByte: ofByte, checkingMsb: bit, checkingLsb: bit)
+            try! self.init(ofByte: ofByte, checkingMsb: bit, checkingLsb: bit, options: [] )
         }
 
         var byte: UInt8 {
@@ -120,6 +128,8 @@ class BitStorageCore {
         }
     }
 
+
+
     @propertyWrapper
     struct position<T> where T: RawRepresentable, T.RawValue == UInt8 {
         var storage: ByteCoder
@@ -134,7 +144,7 @@ class BitStorageCore {
         }
 
         init(wrappedValue: T, _ subByte: SubByte) {
-            if T.requiresSignExtension() {  // FIXME: doesn't get overridden
+            if subByte.options.contains(.extendNegativeBit) {
                 self.storage = SignExtended(subByte: subByte)
             }
             else {
