@@ -11,7 +11,7 @@
 import Foundation
 
 protocol ByteCoder {
-    var byte: UInt8 { get set }
+    var widenedToByte: UInt8 { get set }
 }
 
 class BitStorageCore {
@@ -66,7 +66,7 @@ class BitStorageCore {
             mask = UInt8((0b10 << (msb - lsb)) - 1)
         }
 
-        var byte: UInt8 {
+        var widenedToByte: UInt8 {
             get {
                 return (storage.bytes[index] >> lsb) & mask
             }
@@ -82,13 +82,13 @@ class BitStorageCore {
     }
 
     class SignExtended: ByteCoder {
-        let subByte: SubByte
+        let unsignedRepresentation: SubByte
         let signMask: UInt8
         let signFill: UInt8
 
-        var byte: UInt8 {
+        var widenedToByte: UInt8 {
             get {
-                var raw = subByte.byte
+                var raw = unsignedRepresentation.widenedToByte
                 if raw & signMask != 0 {
                     raw |= signFill
                 }
@@ -97,18 +97,18 @@ class BitStorageCore {
             set {
                 var raw = newValue
                 if raw & signMask != 0 {
-                    assert(signFill & raw == signFill, "Raw value \(newValue) will not fit in byte \(subByte.index + 1)")
+                    assert(signFill & raw == signFill, "Raw value \(newValue) will not fit in byte \(unsignedRepresentation.index + 1)")
                     raw &= ~signFill
                 }
-                subByte.byte = raw
+                unsignedRepresentation.widenedToByte = raw
             }
         }
 
         init(ofByte: Int, msb: Int, lsb: Int) throws {
-            self.subByte = try SubByte(ofByte: ofByte, msb: msb, lsb: lsb)
+            unsignedRepresentation = try SubByte(ofByte: ofByte, msb: msb, lsb: lsb)
 
-            signMask = 1 << (subByte.msb - subByte.lsb)
-            signFill = 0xff ^ (subByte.mask)
+            signMask = 1 << (msb - lsb)
+            signFill = 0xff ^ unsignedRepresentation.mask
         }
     }
 
@@ -120,10 +120,10 @@ class BitStorageCore {
 
         var wrappedValue: T {
             get {
-                T(rawValue: storage.byte)!
+                T(rawValue: storage.widenedToByte)!
             }
             set {
-                storage.byte = newValue.rawValue
+                storage.widenedToByte = newValue.rawValue
             }
         }
 
