@@ -20,16 +20,17 @@ class BitStorageSubByteTests: XCTestCase {
     }
 
     func testInitBounds() throws {
-        XCTAssertThrowsError( try BitStorageCore.SubByte(ofByte: 2, msb: 8, lsb: 6),
+        let storage = Storage()
+        XCTAssertThrowsError( try SubByte(ofByte: 2, msb: 8, lsb: 6, storedIn: storage),
                               "msb outside of the byte")
 
-        XCTAssertThrowsError( try BitStorageCore.SubByte(ofByte: 1, msb: 2, lsb: 3),
+        XCTAssertThrowsError( try SubByte(ofByte: 1, msb: 2, lsb: 3, storedIn: storage),
                               "enforce lsb and msb ordering" )
 
-        XCTAssertThrowsError( try BitStorageCore.SubByte(ofByte: 1, msb: 2, lsb: -1),
+        XCTAssertThrowsError( try SubByte(ofByte: 1, msb: 2, lsb: -1, storedIn: storage),
                               "lsb must not be negative" )
 
-        XCTAssertThrowsError( try BitStorageCore.SubByte(ofByte: 0, msb: 3, lsb: 3),
+        XCTAssertThrowsError( try SubByte(ofByte: 0, msb: 3, lsb: 3, storedIn: storage),
                               "byte offset is one-indexed; zero or below should be disallowed" )
     }
 
