@@ -47,7 +47,7 @@ class BitStorageCore {
 
         let mask: UInt8
 
-        init(ofByte: Int, checkingMsb msb: Int, checkingLsb lsb: Int) throws {
+        init(ofByte: Int, msb: Int, lsb: Int) throws {
             enum RangeError: Error {
                 case badByteIndex
                 case bitOrdering
@@ -128,7 +128,7 @@ class BitStorageCore {
         }
 
         init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
-            let subByte = try! SubByte(ofByte: ofByte, checkingMsb: msb, checkingLsb: lsb)
+            let subByte = try! SubByte(ofByte: ofByte, msb: msb, lsb: lsb)
             if options.contains(.extendNegativeBit) {
                 self.storage = SignExtended(subByte: subByte)
             }
