@@ -36,7 +36,7 @@ class BitStorageSubByteTests: XCTestCase {
 
     func testStorageAliasing() throws {
         class SomeStoreKind: BitStorageCore {
-            @position(SubByte(ofByte: 1, bit: 4))
+            @position(ofByte: 1, bit: 4)
             var blargh = true
         }
 

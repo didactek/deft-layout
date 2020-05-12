@@ -68,14 +68,6 @@ class BitStorageCore {
             self.options = options
         }
 
-        convenience init(ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
-            try! self.init(ofByte: ofByte, checkingMsb: msb, checkingLsb: lsb, options: options)
-        }
-
-        convenience init(ofByte: Int, bit: Int) {
-            try! self.init(ofByte: ofByte, checkingMsb: bit, checkingLsb: bit, options: [] )
-        }
-
         var byte: UInt8 {
             get {
                 return (storage.bytes[index] >> lsb) & mask
@@ -137,7 +129,8 @@ class BitStorageCore {
             }
         }
 
-        init(wrappedValue: T, _ subByte: SubByte) {
+        init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
+            let subByte = try! SubByte(ofByte: ofByte, checkingMsb: msb, checkingLsb: lsb, options: options)
             if subByte.options.contains(.extendNegativeBit) {
                 self.storage = SignExtended(subByte: subByte)
             }
@@ -146,6 +139,11 @@ class BitStorageCore {
             }
             self.wrappedValue = wrappedValue
         }
+
+        init(wrappedValue: T, ofByte: Int, bit: Int) {
+            self.init(wrappedValue: wrappedValue, ofByte: ofByte, msb: bit, lsb: bit, [])
+        }
+
     }
 }
 
