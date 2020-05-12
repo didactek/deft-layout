@@ -104,8 +104,8 @@ class BitStorageCore {
             }
         }
 
-        init(subByte: SubByte) {
-            self.subByte = subByte
+        init(ofByte: Int, msb: Int, lsb: Int) throws {
+            self.subByte = try SubByte(ofByte: ofByte, msb: msb, lsb: lsb)
 
             signMask = 1 << (subByte.msb - subByte.lsb)
             signFill = 0xff ^ (subByte.mask)
@@ -128,13 +128,13 @@ class BitStorageCore {
         }
 
         init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
-            let subByte = try! SubByte(ofByte: ofByte, msb: msb, lsb: lsb)
             if options.contains(.extendNegativeBit) {
-                self.storage = SignExtended(subByte: subByte)
+                self.storage = try! SignExtended(ofByte: ofByte, msb: msb, lsb: lsb)
             }
             else {
-                self.storage = subByte
+                self.storage = try! SubByte(ofByte: ofByte, msb: msb, lsb: lsb)
             }
+
             self.wrappedValue = wrappedValue
         }
 
