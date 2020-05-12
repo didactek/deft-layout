@@ -38,23 +38,23 @@ class BitStorageCore {
 
     @propertyWrapper
     struct position<T> where T: RawRepresentable, T.RawValue == UInt8 {
-        var storage: ByteCoder
+        var coder: ByteCoder
 
         var wrappedValue: T {
             get {
-                T(rawValue: storage.widenedToByte)!
+                T(rawValue: coder.widenedToByte)!
             }
             set {
-                storage.widenedToByte = newValue.rawValue
+                coder.widenedToByte = newValue.rawValue
             }
         }
 
         init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
             if options.contains(.extendNegativeBit) {
-                self.storage = try! SignExtended(ofByte: ofByte, msb: msb, lsb: lsb, storedIn: BitStorageCore._storage)
+                self.coder = try! SignExtended(ofByte: ofByte, msb: msb, lsb: lsb, storedIn: BitStorageCore._storage)
             }
             else {
-                self.storage = try! SubByte(ofByte: ofByte, msb: msb, lsb: lsb, storedIn: BitStorageCore._storage)
+                self.coder = try! SubByte(ofByte: ofByte, msb: msb, lsb: lsb, storedIn: BitStorageCore._storage)
             }
 
             self.wrappedValue = wrappedValue
