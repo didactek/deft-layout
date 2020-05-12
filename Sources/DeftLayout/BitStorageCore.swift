@@ -10,6 +10,14 @@
 
 import Foundation
 
+
+protocol BitEmbeddable {
+    associatedtype RawValue: FixedWidthInteger
+    init?(rawValue: RawValue)
+    var rawValue: RawValue { get }
+//    static var isSigned: Bool { get }
+}
+
 class Storage {
     var bytes: [UInt8] = []
 }
@@ -37,7 +45,7 @@ class BitStorageCore {
 
 
     @propertyWrapper
-    struct position<T> where T: RawRepresentable, T.RawValue == UInt8 {
+    struct position<T> where T: BitEmbeddable {
         var coder: ByteCoder
 
         var wrappedValue: T {
@@ -63,11 +71,10 @@ class BitStorageCore {
         init(wrappedValue: T, ofByte: Int, bit: Int) {
             self.init(wrappedValue: wrappedValue, ofByte: ofByte, msb: bit, lsb: bit, [])
         }
-
     }
 }
 
-extension UInt8: RawRepresentable {
+extension UInt8: BitEmbeddable {
     public typealias RawValue = UInt8
     public init?(rawValue: RawValue) {
         self = rawValue
@@ -77,7 +84,7 @@ extension UInt8: RawRepresentable {
     }
 }
 
-extension Int8: RawRepresentable {
+extension Int8: BitEmbeddable {
     public typealias RawValue = UInt8
 
     public init?(rawValue: RawValue) {
@@ -89,7 +96,11 @@ extension Int8: RawRepresentable {
 
 }
 
-extension Bool: RawRepresentable {
+extension Bool: BitEmbeddable {
+    static var isSigned: Bool {
+        false
+    }
+
     public typealias RawValue = UInt8
     public init?(rawValue: RawValue) {
         self = rawValue == 1
@@ -98,3 +109,13 @@ extension Bool: RawRepresentable {
         return self ? 1 : 0
     }
 }
+
+
+// how do I assert that some RawRepresentables can be adapted to BitEmbeddable
+// where RawValue is a FixedWidthInteger?
+//extension RawRepresentable: BitEmbeddable where RawValue: FixedWidthInteger
+
+// This doesn't do anything:
+//extension RawRepresentable where Self: BitEmbeddable {
+////    static var isSigned: Bool = false
+//}
