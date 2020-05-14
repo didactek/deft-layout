@@ -50,10 +50,10 @@ class BitStorageCore {
 
         var wrappedValue: T {
             get {
-                T(rawValue: coder.widenedToByte)!
+                T(rawValue: T.RawValue(coder.widenedToByte))!
             }
             set {
-                coder.widenedToByte = newValue.rawValue
+                coder.widenedToByte = UInt8(newValue.rawValue)
             }
         }
 

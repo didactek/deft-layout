@@ -18,7 +18,7 @@ class BitStorageUnsignedTests: XCTestCase {
         var midWord: UInt8 = 0b00
 
         @position(ofByte: 1, msb: 1, lsb: 0)
-        var lastWord: Int = 0b11
+        var lastWord: Int8 = 0b11
     }
     var coder = UnsignedRange()  // object under test
 
