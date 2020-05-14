@@ -20,7 +20,7 @@ class BitStorageSubByteTests: XCTestCase {
     }
 
     func testInitBounds() throws {
-        let storage = Storage()
+        let storage = CommonUnderlayment()
         XCTAssertThrowsError( try SubByte(ofByte: 2, msb: 8, lsb: 6, storedIn: storage),
                               "msb outside of the byte")
 

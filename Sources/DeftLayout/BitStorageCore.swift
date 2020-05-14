@@ -19,12 +19,12 @@ protocol BitEmbeddable {
 
 /// Shareable representation of an assembled buffer.
 ///
-/// Semantics of the individual bits are defined by subclasses of `BitStorageCore`
+/// Shared by a BitStorageCore instance and its ByteCoder attributes.
+/// Individual bits are read/written by `@position` attributes of subclasses of `BitStorageCore`.
 ///
 /// - SeeAlso: `BitStorageCore`, `ByteCoder`
 class CommonUnderlayment {
-    // FIXME: make this Data?
-    var bytes: [UInt8] = []
+    var bytes = Data()
 }
 
 class BitStorageCore {
