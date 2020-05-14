@@ -20,7 +20,7 @@ class BitStorageBoolTests: XCTestCase {
         @position(ofByte: 1, bit: 2)
         var mid = true
     }
-    var coder = BoolAndBit()  // object under test
+    let coder = BoolAndBit()  // object under test
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -40,7 +40,6 @@ class BitStorageBoolTests: XCTestCase {
     }
 
     func testWrite() throws {
-        // FIXME compiler lets me alter a 'let': does this expose an error in mutation sematics?
         coder.msb = false
         XCTAssertEqual(coder.storage.bytes[0], 0b0000_0100, "clear top bit")
 
