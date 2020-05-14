@@ -17,22 +17,28 @@ protocol BitEmbeddable {
     var rawValue: RawValue { get }
 }
 
-class Storage {
+/// Shareable representation of an assembled buffer.
+///
+/// Semantics of the individual bits are defined by subclasses of `BitStorageCore`
+///
+/// - SeeAlso: `BitStorageCore`, `ByteCoder`
+class CommonUnderlayment {
+    // FIXME: make this Data?
     var bytes: [UInt8] = []
 }
 
 class BitStorageCore {
     // During their initialization, derived classes copy references to this underlying representation
     // for their property wrappers...
-    private static var _storage = Storage()
+    private static var _storage = CommonUnderlayment()
     // ...after which the base class BitStorageCore initializer rolls the static storage over for the next instantiation. This means there is always a yet-to-be-used Storage lying in wait.
-    private static func freezeAndRotateStorage() -> Storage {
+    private static func freezeAndRotateStorage() -> CommonUnderlayment {
         let tmp = _storage
-        _storage = Storage()
+        _storage = CommonUnderlayment()
         return tmp
     }
 
-    let storage: Storage
+    let storage: CommonUnderlayment
 
     init() {
         storage = Self.freezeAndRotateStorage()
