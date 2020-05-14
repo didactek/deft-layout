@@ -19,8 +19,8 @@ protocol BitEmbeddable {
 
 /// Shareable representation of an assembled buffer.
 ///
-/// Shared by a BitStorageCore instance and its ByteCoder attributes.
-/// Individual bits are read/written by `@position` attributes of subclasses of `BitStorageCore`.
+/// Shared by a BitStorageCore instance and its ByteCoder properties.
+/// Individual bits are read/written by `@position` properties of subclasses of `BitStorageCore`.
 ///
 /// - SeeAlso: `BitStorageCore`, `ByteCoder`
 class CommonUnderlayment {
