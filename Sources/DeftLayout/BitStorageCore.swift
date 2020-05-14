@@ -25,6 +25,8 @@ protocol BitEmbeddable {
 /// - SeeAlso: `BitStorageCore`, `ByteCoder`
 class CommonUnderlayment {
     var bytes = Data()
+
+
 }
 
 class BitStorageCore {
@@ -36,6 +38,14 @@ class BitStorageCore {
         let tmp = _storage
         _storage = CommonUnderlayment()
         return tmp
+    }
+    // FIXME: What would be cool: proof of use in a ByteCoder required for access.
+    // This could be useful in debug prints of storage that decode object.
+    // But it's not obvious how to implement this because it's a chicken-and-egg problem: you can't prove
+    // you are a coder until you make one, and that requires a storage handle.
+    // Same for self.
+    private static func storageBuildInProgress(/*coder _: ByteCoder*/) -> CommonUnderlayment {
+        return _storage
     }
 
     let storage: CommonUnderlayment
@@ -52,7 +62,7 @@ class BitStorageCore {
 
 
     @propertyWrapper
-    struct position<T> where T: BitEmbeddable {
+    struct position<T: BitEmbeddable> {
         var coder: ByteCoder
 
         var wrappedValue: T {
@@ -66,10 +76,10 @@ class BitStorageCore {
 
         init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
             if options.contains(.extendNegativeBit) {
-                self.coder = try! SignExtended(ofByte: ofByte, msb: msb, lsb: lsb, storedIn: BitStorageCore._storage)
+                self.coder = try! SignExtended(ofByte: ofByte, msb: msb, lsb: lsb, storedIn: BitStorageCore.storageBuildInProgress())
             }
             else {
-                self.coder = try! SubByte(ofByte: ofByte, msb: msb, lsb: lsb, storedIn: BitStorageCore._storage)
+                self.coder = try! SubByte(ofByte: ofByte, msb: msb, lsb: lsb, storedIn: BitStorageCore.storageBuildInProgress())
             }
 
             self.wrappedValue = wrappedValue
