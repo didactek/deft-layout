@@ -22,18 +22,20 @@ class Storage {
 }
 
 class BitStorageCore {
-    // SubByte will take references from this pool
-    // for all its property wrappers...
+    // During their initialization, derived classes copy references to this underlying representation
+    // for their property wrappers...
     private static var _storage = Storage()
+    // ...after which the base class BitStorageCore initializer rolls the static storage over for the next instantiation. This means there is always a yet-to-be-used Storage lying in wait.
+    private static func freezeAndRotateStorage() -> Storage {
+        let tmp = _storage
+        _storage = Storage()
+        return tmp
+    }
 
     let storage: Storage
 
-    required init() {
-        // HACK HACK HACK BARF BARF BARF:
-        storage = Self._storage
-        // rotate the factory
-        // ...and when construction is done, roll over for the next instantiation
-        Self._storage = Storage()
+    init() {
+        storage = Self.freezeAndRotateStorage()
     }
 
     struct PositionOptions: OptionSet {
@@ -117,10 +119,12 @@ extension Bool: BitEmbeddable {
 }
 
 
-// how do I assert that some RawRepresentables can be adapted to BitEmbeddable
-// where RawValue is a FixedWidthInteger?
-//extension RawRepresentable: BitEmbeddable where RawValue: FixedWidthInteger
-
-// This doesn't do anything:
-//extension RawRepresentable where Self: BitEmbeddable {
-//}
+// It would be nice to give generic instruction to the compiler that certain protocols can and should be adapted to BitEmbeddable when they are needed for the property wrapper.
+//
+// Such a feature would reduce the user-facing boilerplate in every enum declaration--declarations where the compiler synthetically injects the RawRepresentable but doesn't know about our desire for conformance to another protocol.
+//
+// extension FixedWidthInteger: BitEmbeddable ...
+// extension RawRepresentable: BitEmbeddable where RawValue: UInt8
+//
+// As of Swift 5.1, extending protocols in this way is not part of the language, but there is discussion surrounding it. It would be useful (and expressive) in cases like this, but it would also complicate runtime facets of the type system. For more, see:
+// https://github.com/apple/swift/blob/main/docs/GenericsManifesto.md#retroactive-protocol-refinement
