@@ -14,14 +14,14 @@ protocol ByteCoder {
 }
 
 class SubByte: ByteCoder {
-    let storage: CommonUnderlayment
+    let storage: AssembledMessage
     let index: Int
     let msb: Int
     let lsb: Int
 
     let mask: UInt8
 
-    init(ofByte: Int, msb: Int, lsb: Int, storedIn: CommonUnderlayment) throws {
+    init(ofByte: Int, msb: Int, lsb: Int, storedIn: AssembledMessage) throws {
         enum RangeError: Error {
             case badByteIndex
             case bitOrdering
@@ -78,7 +78,7 @@ class SignExtended: ByteCoder {
         }
     }
 
-    init(ofByte: Int, msb: Int, lsb: Int, storedIn: CommonUnderlayment) throws {
+    init(ofByte: Int, msb: Int, lsb: Int, storedIn: AssembledMessage) throws {
         unsignedRepresentation = try SubByte(ofByte: ofByte, msb: msb, lsb: lsb, storedIn: storedIn)
 
         signMask = 1 << (msb - lsb)
