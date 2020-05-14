@@ -26,15 +26,11 @@ protocol BitEmbeddable {
 class CommonUnderlayment {
     var bytes = Data()
 
-
-}
-
-class BitStorageCore {
     // During their initialization, derived classes copy references to this underlying representation
     // for their property wrappers...
     private static var _storage = CommonUnderlayment()
     // ...after which the base class BitStorageCore initializer rolls the static storage over for the next instantiation. This means there is always a yet-to-be-used Storage lying in wait.
-    private static func freezeAndRotateStorage() -> CommonUnderlayment {
+    static func freezeAndRotateStorage() -> CommonUnderlayment {
         let tmp = _storage
         _storage = CommonUnderlayment()
         return tmp
@@ -44,14 +40,16 @@ class BitStorageCore {
     // But it's not obvious how to implement this because it's a chicken-and-egg problem: you can't prove
     // you are a coder until you make one, and that requires a storage handle.
     // Same for self.
-    private static func storageBuildInProgress(/*coder _: ByteCoder*/) -> CommonUnderlayment {
+    static func storageBuildInProgress(/*coder _: ByteCoder*/) -> CommonUnderlayment {
         return _storage
     }
+}
 
+class BitStorageCore {
     let storage: CommonUnderlayment
 
     init() {
-        storage = Self.freezeAndRotateStorage()
+        storage = CommonUnderlayment.freezeAndRotateStorage()
     }
 
     struct PositionOptions: OptionSet {
@@ -76,10 +74,10 @@ class BitStorageCore {
 
         init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
             if options.contains(.extendNegativeBit) {
-                self.coder = try! SignExtended(ofByte: ofByte, msb: msb, lsb: lsb, storedIn: BitStorageCore.storageBuildInProgress())
+                self.coder = try! SignExtended(ofByte: ofByte, msb: msb, lsb: lsb, storedIn: CommonUnderlayment.storageBuildInProgress())
             }
             else {
-                self.coder = try! SubByte(ofByte: ofByte, msb: msb, lsb: lsb, storedIn: BitStorageCore.storageBuildInProgress())
+                self.coder = try! SubByte(ofByte: ofByte, msb: msb, lsb: lsb, storedIn: CommonUnderlayment.storageBuildInProgress())
             }
 
             self.wrappedValue = wrappedValue
