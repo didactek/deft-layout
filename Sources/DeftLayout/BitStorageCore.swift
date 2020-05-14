@@ -15,7 +15,6 @@ protocol BitEmbeddable {
     associatedtype RawValue: FixedWidthInteger
     init?(rawValue: RawValue)
     var rawValue: RawValue { get }
-//    static var isSigned: Bool { get }
 }
 
 class Storage {
@@ -93,14 +92,21 @@ extension Int8: BitEmbeddable {
     public var rawValue: UInt8 {
         return RawValue(bitPattern: self)
     }
+}
 
+extension Int: BitEmbeddable {
+    public typealias RawValue = UInt8
+
+    public init?(rawValue: RawValue) {
+        // FIXME: this probably sign-extends Int8s with the high bit set. (Int7 OK for all values)
+        self = Self(truncatingIfNeeded: Int8(bitPattern: rawValue))
+    }
+    public var rawValue: UInt8 {
+        return RawValue(truncatingIfNeeded: self)
+    }
 }
 
 extension Bool: BitEmbeddable {
-    static var isSigned: Bool {
-        false
-    }
-
     public typealias RawValue = UInt8
     public init?(rawValue: RawValue) {
         self = rawValue == 1
@@ -117,5 +123,4 @@ extension Bool: BitEmbeddable {
 
 // This doesn't do anything:
 //extension RawRepresentable where Self: BitEmbeddable {
-////    static var isSigned: Bool = false
 //}

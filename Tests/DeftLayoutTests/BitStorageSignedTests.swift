@@ -10,7 +10,7 @@
 import XCTest
 
 class BitStorageSignedTests: XCTestCase {
-    typealias SmallSigned = Int8
+    typealias SmallSigned = Int // or Int8
 
     class SignedRange: BitStorageCore {
         @position(ofByte: 1, msb: 7, lsb: 4, .extendNegativeBit)
@@ -68,12 +68,12 @@ class BitStorageSignedTests: XCTestCase {
 
     func testSignExtension() throws {
         coder.sixBits = -4
-        XCTAssertEqual(coder.sixBits, -4, "top two bits should be sign-extended")
+        XCTAssertEqual(coder.sixBits, -4, "top bits should be sign-extended")
 
         coder.sixBits = 29
         XCTAssertEqual(coder.sixBits, 29, "no sign extension for positive values")
 
         coder.sixBits = -29
-        XCTAssertEqual(coder.sixBits, -29, "top two bits should be sign-extended")
+        XCTAssertEqual(coder.sixBits, -29, "top bits should be sign-extended")
     }
 }
