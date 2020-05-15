@@ -15,8 +15,9 @@ class MultiByteCoder: ByteCoder {
     let endIndex: Int
     let msb: Int
     let lsb: Int
+    let isSigned: Bool
 
-    init(significantByte: Int, msb: Int, minorByte: Int, lsb: Int, storedIn: AssembledMessage) throws {
+    init(significantByte: Int, msb: Int, minorByte: Int, lsb: Int, signed: Bool, storedIn: AssembledMessage) throws {
         guard significantByte > 0 else { throw BitfieldRangeError.badByteIndex }
         guard significantByte <= minorByte else { throw BitfieldRangeError.badByteIndex }
         guard significantByte < minorByte || msb >= lsb else { throw BitfieldRangeError.bitOrdering }
@@ -32,10 +33,51 @@ class MultiByteCoder: ByteCoder {
         self.endIndex = minorByte - 1
         self.msb = msb
         self.lsb = lsb
+        self.isSigned = signed
+    }
+
+    // FIXME: unify 'raw' and 'encoded' terminology
+    // FIXME: checking
+
+    // traits:
+    // terminology: "Mask" suggests 0 or more bits set; MaskedBit
+
+    /// Count of bits available for coding.
+    var encodedWidth: Int {
+        8 * (endIndex - startIndex) + msb - lsb + 1
+    }
+
+    /// Mask with (high) bits that cannot be encoded set to 1.
+    var excessMask: UInt {
+        let valueMask = (UInt(1) << encodedWidth) - 1
+        return ~valueMask
+    }
+
+
+    var signBitMaskedWide: UInt {
+        UInt(1) << (UInt.bitWidth - 1)
+    }
+
+
+    func extendSign(ofBit: Int, rightAlignedRawValue: UInt) -> UInt {
+        guard isSigned else {
+            return rightAlignedRawValue
+        }
+
+        let signBitMaskedRaw = UInt(1) << (ofBit - 1)
+
+        if rightAlignedRawValue & signBitMaskedRaw == 0 {
+            // non-negative: no work to do.
+            return rightAlignedRawValue
+        }
+
+        // excessMask *is* all the high bits that need to be sign-extended:
+        return rightAlignedRawValue | excessMask
     }
 
     var widenedToByte: UInt {
         get {
+            // FIXME: clarify
             let topByteMask = UInt8((0b10 << msb) - 1)
             var value = UInt(storage.bytes[startIndex] & topByteMask)
             if startIndex < endIndex {
@@ -44,18 +86,34 @@ class MultiByteCoder: ByteCoder {
                     value += UInt(storage.bytes[index])
                 }
             }
-            value = value >> lsb
-            return value
+            value = value >> lsb  // FIXME: we may have overflowed at this point if lsb + width > UInt.bitWidth
+
+            return extendSign(ofBit: encodedWidth, rightAlignedRawValue: value)
         }
         set {
-            // FIXME: range checking...
-//            assert(newValue == (newValue & mask), "Raw value \(newValue) will not fit in byte \(index + 1), lsb \(lsb)")
+            var remaining = newValue
+
+            if isSigned{
+                print("value:", Int(truncatingIfNeeded: newValue),
+                      "as:", String(newValue, radix: 2),
+                      "signBit:", String(signBitMaskedWide, radix: 2),
+                      "mask", String(excessMask, radix: 2))
+            }
+            if isSigned && (newValue & signBitMaskedWide != 0) {
+                assert( (remaining & excessMask) == excessMask, "negative number too negative to fit in allocated bits")
+                print("contracting sign")
+                remaining = remaining & ~excessMask  // clear the sign extension that won't appear in the encoded value
+            }
+
+            assert(remaining == (remaining & ~excessMask), "Raw value \(newValue) (possibly sign-contracted to \(remaining) will not fit starting in byte \(startIndex + 1), bit \(msb)")
+
+
             // grow storage:
             while storage.bytes.count <= endIndex {
                 storage.bytes.append(0)
             }
 
-            var remaining = newValue
+
             // chew off from the lsb:
             var lsb = self.lsb
             for index in stride(from: endIndex, to: startIndex, by: -1) {

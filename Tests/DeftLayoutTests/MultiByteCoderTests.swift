@@ -22,7 +22,7 @@ class MultiByteCoderTests: XCTestCase {
     func testThreeByteSpan() throws {
         let bytes = AssembledMessage()
 
-        let coder = try! MultiByteCoder(significantByte: 2, msb: 4, minorByte: 5, lsb: 7, storedIn: bytes) // object under test
+        let coder = try! MultiByteCoder(significantByte: 2, msb: 4, minorByte: 5, lsb: 7, signed: false, storedIn: bytes) // object under test
 
 
         coder.widenedToByte = 0
@@ -42,7 +42,7 @@ class MultiByteCoderTests: XCTestCase {
     func testAdjacentSpan() throws {
         let bytes = AssembledMessage()
 
-        let coder = try! MultiByteCoder(significantByte: 1, msb: 2, minorByte: 2, lsb: 7, storedIn: bytes) // object under test
+        let coder = try! MultiByteCoder(significantByte: 1, msb: 2, minorByte: 2, lsb: 7, signed: false, storedIn: bytes) // object under test
 
 
         coder.widenedToByte = 0
@@ -61,7 +61,7 @@ class MultiByteCoderTests: XCTestCase {
     func testSingleByte() throws {
         let bytes = AssembledMessage()
 
-        let coder = try! MultiByteCoder(significantByte: 2, msb: 3, minorByte: 2, lsb: 0, storedIn: bytes) // object under test
+        let coder = try! MultiByteCoder(significantByte: 2, msb: 3, minorByte: 2, lsb: 0, signed: false, storedIn: bytes) // object under test
 
 
         coder.widenedToByte = 0

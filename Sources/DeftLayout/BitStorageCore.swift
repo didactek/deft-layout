@@ -40,17 +40,16 @@ class BitStorageCore {
                 T(rawValue: T.RawValue(coder.widenedToByte))!
             }
             set {
-                coder.widenedToByte = UInt(Int(truncatingIfNeeded: newValue.rawValue))
+                // for signed quantities, we deal with sign extension here, where we have
+                // access to T.RawValue's width. N.B. RawValue is always unsigned, so
+                // the truncatingIfNeeded functions won't extend sign for us.
+                let raw = coder.extendSign(ofBit: T.RawValue.bitWidth, rightAlignedRawValue: UInt(truncatingIfNeeded:  newValue.rawValue))
+                coder.widenedToByte = raw
             }
         }
 
         init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
-            if options.contains(.extendNegativeBit) {
-                self.coder = try! SignedMultiByteCoder(significantByte: ofByte, msb: msb, minorByte: ofByte, lsb: lsb, storedIn: AssembledMessage.storageBuildInProgress())
-            }
-            else {
-                self.coder = try! MultiByteCoder(significantByte: ofByte, msb: msb, minorByte: ofByte, lsb: lsb, storedIn: AssembledMessage.storageBuildInProgress())
-            }
+            self.coder = try! MultiByteCoder(significantByte: ofByte, msb: msb, minorByte: ofByte, lsb: lsb, signed: options.contains(.extendNegativeBit), storedIn: AssembledMessage.storageBuildInProgress())
 
             self.wrappedValue = wrappedValue
         }
