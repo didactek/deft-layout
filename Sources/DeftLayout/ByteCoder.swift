@@ -11,6 +11,13 @@ import Foundation
 
 protocol ByteCoder {
     var widenedToByte: UInt8 { get set }
+
+}
+
+enum BitfieldRangeError: Error {
+    case badByteIndex
+    case bitOrdering
+    case byteWidthExceeded
 }
 
 class SubByte: ByteCoder {
@@ -22,15 +29,10 @@ class SubByte: ByteCoder {
     let mask: UInt8
 
     init(ofByte: Int, msb: Int, lsb: Int, storedIn: AssembledMessage) throws {
-        enum RangeError: Error {
-            case badByteIndex
-            case bitOrdering
-            case byteWidthExceeded
-        }
-        guard ofByte > 0 else { throw RangeError.badByteIndex }
-        guard msb >= lsb else { throw RangeError.bitOrdering }
-        guard msb < 8 else { throw RangeError.byteWidthExceeded }
-        guard lsb >= 0 else { throw RangeError.byteWidthExceeded }
+        guard ofByte > 0 else { throw BitfieldRangeError.badByteIndex }
+        guard msb >= lsb else { throw BitfieldRangeError.bitOrdering }
+        guard msb < 8 else { throw BitfieldRangeError.byteWidthExceeded }
+        guard lsb >= 0 else { throw BitfieldRangeError.byteWidthExceeded }
 
         storage = storedIn
 
