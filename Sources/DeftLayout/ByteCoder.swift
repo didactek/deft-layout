@@ -10,8 +10,7 @@
 import Foundation
 
 protocol ByteCoder {
-    // FIXME: var get/set is not the right interface for these operations
-    var widenedToByte: UInt { get set }
+    var wideRepresentation: UInt { get set }
     func extendingSign(of rawValue: UInt, fromPosition bit: Int) -> UInt
 }
 

@@ -38,14 +38,14 @@ class BitStorageCore {
 
         var wrappedValue: T {
             get {
-                T(rawValue: T.RawValue(truncatingIfNeeded: coder.widenedToByte))!
+                T(rawValue: T.RawValue(truncatingIfNeeded: coder.wideRepresentation))!
             }
             set {
                 // for signed quantities, we deal with sign extension here, where we have
                 // access to T.RawValue's width. N.B. RawValue is always unsigned, so
                 // the truncatingIfNeeded functions won't extend sign for us.
                 let raw = coder.extendingSign(of: UInt(truncatingIfNeeded: newValue.rawValue), fromPosition: T.RawValue.bitWidth)
-                coder.widenedToByte = raw
+                coder.wideRepresentation = raw
             }
         }
 

@@ -73,7 +73,7 @@ class MultiByteCoder: ByteCoder {
         return rawValue | excessMask
     }
 
-    var widenedToByte: UInt {
+    var wideRepresentation: UInt {
         get {
             // FIXME: clarify
             let topByteMask = UInt8((0b10 << msb) - 1)

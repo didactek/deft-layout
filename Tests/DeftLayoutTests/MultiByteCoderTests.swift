@@ -25,18 +25,18 @@ class MultiByteCoderTests: XCTestCase {
         let coder = try! MultiByteCoder(significantByte: 2, msb: 4, minorByte: 5, lsb: 7, signed: false, storedIn: bytes) // object under test
 
 
-        coder.widenedToByte = 0
-        XCTAssertEqual(coder.widenedToByte, 0)
+        coder.wideRepresentation = 0
+        XCTAssertEqual(coder.wideRepresentation, 0)
         XCTAssertEqual(bytes.bytes.count, 5, "should increase buffer size to deepest byte")
 
-        coder.widenedToByte = 1_234_567
-        XCTAssertEqual(coder.widenedToByte, 1_234_567)
+        coder.wideRepresentation = 1_234_567
+        XCTAssertEqual(coder.wideRepresentation, 1_234_567)
 
-        coder.widenedToByte = 1
-        XCTAssertEqual(coder.widenedToByte, 1)
+        coder.wideRepresentation = 1
+        XCTAssertEqual(coder.wideRepresentation, 1)
 
-        coder.widenedToByte = 32
-        XCTAssertEqual(coder.widenedToByte, 32)
+        coder.wideRepresentation = 32
+        XCTAssertEqual(coder.wideRepresentation, 32)
     }
 
     func testAdjacentSpan() throws {
@@ -45,17 +45,17 @@ class MultiByteCoderTests: XCTestCase {
         let coder = try! MultiByteCoder(significantByte: 1, msb: 2, minorByte: 2, lsb: 7, signed: false, storedIn: bytes) // object under test
 
 
-        coder.widenedToByte = 0
-        XCTAssertEqual(coder.widenedToByte, 0)
+        coder.wideRepresentation = 0
+        XCTAssertEqual(coder.wideRepresentation, 0)
 
-        coder.widenedToByte = 9
-        XCTAssertEqual(coder.widenedToByte, 9)
+        coder.wideRepresentation = 9
+        XCTAssertEqual(coder.wideRepresentation, 9)
 
-        coder.widenedToByte = 13
-        XCTAssertEqual(coder.widenedToByte, 13)
+        coder.wideRepresentation = 13
+        XCTAssertEqual(coder.wideRepresentation, 13)
 
-        coder.widenedToByte = 1
-        XCTAssertEqual(coder.widenedToByte, 1)
+        coder.wideRepresentation = 1
+        XCTAssertEqual(coder.wideRepresentation, 1)
     }
 
     func testSingleByte() throws {
@@ -64,16 +64,16 @@ class MultiByteCoderTests: XCTestCase {
         let coder = try! MultiByteCoder(significantByte: 2, msb: 3, minorByte: 2, lsb: 0, signed: false, storedIn: bytes) // object under test
 
 
-        coder.widenedToByte = 0
-        XCTAssertEqual(coder.widenedToByte, 0)
+        coder.wideRepresentation = 0
+        XCTAssertEqual(coder.wideRepresentation, 0)
 
-        coder.widenedToByte = 9
-        XCTAssertEqual(coder.widenedToByte, 9)
+        coder.wideRepresentation = 9
+        XCTAssertEqual(coder.wideRepresentation, 9)
 
-        coder.widenedToByte = 13
-        XCTAssertEqual(coder.widenedToByte, 13)
+        coder.wideRepresentation = 13
+        XCTAssertEqual(coder.wideRepresentation, 13)
 
-        coder.widenedToByte = 1
-        XCTAssertEqual(coder.widenedToByte, 1)
+        coder.wideRepresentation = 1
+        XCTAssertEqual(coder.wideRepresentation, 1)
     }
 }
