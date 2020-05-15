@@ -37,7 +37,6 @@ class MultiByteCoder: ByteCoder {
     }
 
     // FIXME: unify 'raw' and 'encoded' terminology
-    // FIXME: checking
 
     // traits:
     // terminology: "Mask" suggests 0 or more bits set; MaskedBit
@@ -58,21 +57,20 @@ class MultiByteCoder: ByteCoder {
         UInt(1) << (UInt.bitWidth - 1)
     }
 
-
-    func extendSign(ofBit: Int, rightAlignedRawValue: UInt) -> UInt {
+    func extendingSign(of rawValue: UInt, fromPosition bit: Int) -> UInt {
         guard isSigned else {
-            return rightAlignedRawValue
+            return rawValue
         }
 
-        let signBitMaskedRaw = UInt(1) << (ofBit - 1)
+        let signBitMaskedRaw = UInt(1) << (bit - 1)
 
-        if rightAlignedRawValue & signBitMaskedRaw == 0 {
+        if rawValue & signBitMaskedRaw == 0 {
             // non-negative: no work to do.
-            return rightAlignedRawValue
+            return rawValue
         }
 
         // excessMask *is* all the high bits that need to be sign-extended:
-        return rightAlignedRawValue | excessMask
+        return rawValue | excessMask
     }
 
     var widenedToByte: UInt {
@@ -88,7 +86,7 @@ class MultiByteCoder: ByteCoder {
             }
             value = value >> lsb  // FIXME: we may have overflowed at this point if lsb + width > UInt.bitWidth
 
-            return extendSign(ofBit: encodedWidth, rightAlignedRawValue: value)
+            return extendingSign(of: value, fromPosition: encodedWidth)
         }
         set {
             var remaining = newValue
@@ -101,7 +99,6 @@ class MultiByteCoder: ByteCoder {
             }
             if isSigned && (newValue & signBitMaskedWide != 0) {
                 assert( (remaining & excessMask) == excessMask, "negative number too negative to fit in allocated bits")
-                print("contracting sign")
                 remaining = remaining & ~excessMask  // clear the sign extension that won't appear in the encoded value
             }
 
@@ -128,7 +125,6 @@ class MultiByteCoder: ByteCoder {
             }
             assert(msb >= lsb, "should still be work left to do")
             let mask = UInt8((0b10 << (msb - lsb)) - 1)
-            //assert(index == startIndex, "I think?")
             let cleared = storage.bytes[startIndex] & ~(mask << lsb)
             storage.bytes[startIndex] = cleared | (UInt8(remaining) << lsb)
         }

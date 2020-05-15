@@ -11,6 +11,7 @@
 import Foundation
 
 
+/// Note: protocol is a subset of RawRepresentable so enums can comply just by mentioning this protocol
 protocol BitEmbeddable {
     associatedtype RawValue: FixedWidthInteger
     init?(rawValue: RawValue)
@@ -37,13 +38,13 @@ class BitStorageCore {
 
         var wrappedValue: T {
             get {
-                T(rawValue: T.RawValue(coder.widenedToByte))!
+                T(rawValue: T.RawValue(truncatingIfNeeded: coder.widenedToByte))!
             }
             set {
                 // for signed quantities, we deal with sign extension here, where we have
                 // access to T.RawValue's width. N.B. RawValue is always unsigned, so
                 // the truncatingIfNeeded functions won't extend sign for us.
-                let raw = coder.extendSign(ofBit: T.RawValue.bitWidth, rightAlignedRawValue: UInt(truncatingIfNeeded:  newValue.rawValue))
+                let raw = coder.extendingSign(of: UInt(truncatingIfNeeded: newValue.rawValue), fromPosition: T.RawValue.bitWidth)
                 coder.widenedToByte = raw
             }
         }
@@ -60,12 +61,37 @@ class BitStorageCore {
     }
 }
 
+
+extension Int: BitEmbeddable {
+    public typealias RawValue = UInt
+
+    public init?(rawValue: RawValue) {
+        // FIXME: this probably sign-extends Int8s with the high bit set. (Int7 OK for all values)
+        self = Self(truncatingIfNeeded: rawValue)
+    }
+    public var rawValue: RawValue {
+        return RawValue(truncatingIfNeeded: self)
+    }
+}
+
+extension Bool: BitEmbeddable {
+    public typealias RawValue = UInt8
+    public init?(rawValue: RawValue) {
+        self = rawValue == 1
+    }
+    public var rawValue: RawValue {
+        return self ? 1 : 0
+    }
+}
+
+
+// There may not be value in user code of encoding these, since it's easy to work with the wider "Int/UInt" types, and they get decoded with the same range checking anyway.
 extension UInt8: BitEmbeddable {
     public typealias RawValue = UInt8
     public init?(rawValue: RawValue) {
         self = rawValue
     }
-    public var rawValue: UInt8 {
+    public var rawValue: RawValue {
         return self
     }
 }
@@ -76,30 +102,29 @@ extension Int8: BitEmbeddable {
     public init?(rawValue: RawValue) {
         self = Self(bitPattern: rawValue)
     }
-    public var rawValue: UInt8 {
+    public var rawValue: RawValue {
         return RawValue(bitPattern: self)
     }
 }
 
-extension Int: BitEmbeddable {
-    public typealias RawValue = UInt8
-
+extension UInt16: BitEmbeddable {
+    public typealias RawValue = UInt16
     public init?(rawValue: RawValue) {
-        // FIXME: this probably sign-extends Int8s with the high bit set. (Int7 OK for all values)
-        self = Self(truncatingIfNeeded: Int8(bitPattern: rawValue))
+        self = rawValue
     }
-    public var rawValue: UInt8 {
-        return RawValue(truncatingIfNeeded: self)
+    public var rawValue: RawValue {
+        return self
     }
 }
 
-extension Bool: BitEmbeddable {
-    public typealias RawValue = UInt8
+extension Int16: BitEmbeddable {
+    public typealias RawValue = UInt16
+
     public init?(rawValue: RawValue) {
-        self = rawValue == 1
+        self = Self(truncatingIfNeeded: rawValue)
     }
-    public var rawValue: UInt8 {
-        return self ? 1 : 0
+    public var rawValue: RawValue {
+        return RawValue(truncatingIfNeeded: self)
     }
 }
 

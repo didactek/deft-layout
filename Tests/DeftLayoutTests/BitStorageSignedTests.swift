@@ -10,7 +10,7 @@
 import XCTest
 
 class BitStorageSignedTests: XCTestCase {
-    typealias SmallSigned = Int // or Int8
+    typealias SmallSigned = Int16 // or Int8
 
     class SignedRange: BitStorageCore {
         @position(ofByte: 1, msb: 7, lsb: 4, .extendNegativeBit)
