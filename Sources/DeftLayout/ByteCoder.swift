@@ -10,7 +10,7 @@
 import Foundation
 
 protocol ByteCoder {
-    var widenedToByte: UInt8 { get set }
+    var widenedToByte: UInt { get set }
 
 }
 
@@ -20,7 +20,7 @@ enum BitfieldRangeError: Error {
     case byteWidthExceeded
 }
 
-class SubByte: ByteCoder {
+class SubByte/*: ByteCoder*/ {
     let storage: AssembledMessage
     let index: Int
     let msb: Int
@@ -57,7 +57,7 @@ class SubByte: ByteCoder {
     }
 }
 
-class SignExtended: ByteCoder {
+class SignExtended/*: ByteCoder*/ {
     let unsignedRepresentation: SubByte
     let signMask: UInt8
     let signFill: UInt8

@@ -40,16 +40,16 @@ class BitStorageCore {
                 T(rawValue: T.RawValue(coder.widenedToByte))!
             }
             set {
-                coder.widenedToByte = UInt8(newValue.rawValue)
+                coder.widenedToByte = UInt(Int(truncatingIfNeeded: newValue.rawValue))
             }
         }
 
         init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
             if options.contains(.extendNegativeBit) {
-                self.coder = try! SignExtended(ofByte: ofByte, msb: msb, lsb: lsb, storedIn: AssembledMessage.storageBuildInProgress())
+                self.coder = try! SignedMultiByteCoder(significantByte: ofByte, msb: msb, minorByte: ofByte, lsb: lsb, storedIn: AssembledMessage.storageBuildInProgress())
             }
             else {
-                self.coder = try! SubByte(ofByte: ofByte, msb: msb, lsb: lsb, storedIn: AssembledMessage.storageBuildInProgress())
+                self.coder = try! MultiByteCoder(significantByte: ofByte, msb: msb, minorByte: ofByte, lsb: lsb, storedIn: AssembledMessage.storageBuildInProgress())
             }
 
             self.wrappedValue = wrappedValue

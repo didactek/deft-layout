@@ -9,7 +9,7 @@
 
 import Foundation
 
-class MultiByteCoder {
+class MultiByteCoder: ByteCoder {
     let storage: AssembledMessage
     let startIndex: Int
     let endIndex: Int
@@ -68,7 +68,7 @@ class MultiByteCoder {
                 lsb = 0
                 remaining = remaining >> bitsConsumedInThisPass
             }
-            assert(msb > lsb, "should still be work left to do")
+            assert(msb >= lsb, "should still be work left to do")
             let mask = UInt8((0b10 << (msb - lsb)) - 1)
             //assert(index == startIndex, "I think?")
             let cleared = storage.bytes[startIndex] & ~(mask << lsb)
