@@ -49,15 +49,30 @@ class BitStorageCore {
             }
         }
 
-        init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
-            self.coder = try! MultiByteCoder(significantByte: ofByte, msb: msb, minorByte: ofByte, lsb: lsb, signed: options.contains(.extendNegativeBit), storedIn: AssembledMessage.storageBuildInProgress())
+        init(wrappedValue: T, significantByte: Int, msb: Int,
+             minorByte: Int, lsb: Int,
+             _ options: PositionOptions = []) {
 
+            self.coder = try! MultiByteCoder(significantByte: significantByte, msb: msb,
+                                             minorByte: minorByte, lsb: lsb,
+                                             signed: options.contains(.extendNegativeBit),
+                                             storedIn: AssembledMessage.storageBuildInProgress())
             self.wrappedValue = wrappedValue
+        }
+
+        init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
+            self.init(wrappedValue: wrappedValue, significantByte: ofByte, msb: msb,
+                      minorByte: ofByte, lsb: lsb, options)
         }
 
         init(wrappedValue: T, ofByte: Int, bit: Int) {
             self.init(wrappedValue: wrappedValue, ofByte: ofByte, msb: bit, lsb: bit, [])
         }
+
+        // FIXME: additional usage:
+        // word-oriented positions (might be a separate wrapper?) (refactor MCP9808 to use)
+        // whole-byte positions?
+        // Fixed-point fractionals (again: separate wrapper)
     }
 }
 
