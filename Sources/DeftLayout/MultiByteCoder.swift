@@ -11,8 +11,8 @@ import Foundation
 
 class MultiByteCoder: ByteCoder {
     let storage: AssembledMessage
-    let startIndex: Int
-    let endIndex: Int
+    let mostSignificantByteIndex: Int
+    let leastSignificantByteIndex: Int
     let msb: Int
     let lsb: Int
     let isSigned: Bool
@@ -38,8 +38,8 @@ class MultiByteCoder: ByteCoder {
 
         storage = storedIn
 
-        self.startIndex = significantByte - 1
-        self.endIndex = minorByte - 1
+        self.mostSignificantByteIndex = significantByte - 1
+        self.leastSignificantByteIndex = minorByte - 1
         self.msb = msb
         self.lsb = lsb
         self.isSigned = signed
@@ -53,7 +53,7 @@ class MultiByteCoder: ByteCoder {
 
     /// Count of bits available for coding.
     var encodedWidth: Int {
-        8 * (endIndex - startIndex) + msb - lsb + 1
+        8 * (leastSignificantByteIndex - mostSignificantByteIndex) + msb - lsb + 1
     }
 
     /// Mask with (high) bits that cannot be encoded set to 1.
@@ -90,8 +90,8 @@ class MultiByteCoder: ByteCoder {
 
             var lsb = 0
             var msb = self.msb
-            for index in stride(from: startIndex, through: endIndex, by: littleEndian ? -1 : 1 ) {
-                if index == endIndex {
+            for index in stride(from: mostSignificantByteIndex, through: leastSignificantByteIndex, by: littleEndian ? -1 : 1 ) {
+                if index == leastSignificantByteIndex {
                     lsb = self.lsb
                 }
                 let bitsToAddThisPass = msb - lsb + 1
@@ -118,11 +118,11 @@ class MultiByteCoder: ByteCoder {
                 remaining = remaining & ~excessMask  // clear the sign extension that won't appear in the encoded value
             }
 
-            assert(remaining == (remaining & ~excessMask), "Raw value \(newValue) (possibly sign-contracted to \(remaining) will not fit starting in byte \(startIndex + 1), bit \(msb)")
+            assert(remaining == (remaining & ~excessMask), "Raw value \(newValue) (possibly sign-contracted to \(remaining) will not fit starting in byte \(mostSignificantByteIndex + 1), bit \(msb)")
 
 
             // grow storage:
-            while storage.bytes.count <= max(endIndex, startIndex) {
+            while storage.bytes.count <= max(leastSignificantByteIndex, mostSignificantByteIndex) {
                 storage.bytes.append(0)
             }
 
@@ -130,8 +130,8 @@ class MultiByteCoder: ByteCoder {
             // chew off from the lsb:
             var lsb = self.lsb
             var msb = 7
-            for index in stride(from: endIndex, through: startIndex, by: littleEndian ? 1 : -1) {
-                if index == startIndex {
+            for index in stride(from: leastSignificantByteIndex, through: mostSignificantByteIndex, by: littleEndian ? 1 : -1) {
+                if index == mostSignificantByteIndex {
                     msb = self.msb
                 }
                 let bitsConsumedInThisPass = msb - lsb + 1
