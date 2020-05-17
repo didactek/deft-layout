@@ -76,17 +76,22 @@ class MultiByteCoder: ByteCoder {
 
     var wideRepresentation: UInt {
         get {
-            // FIXME: clarify
-            let topByteMask = UInt8((0b10 << msb) - 1)
-            var value = UInt(storage.bytes[startIndex] & topByteMask)
-            if startIndex < endIndex {
-                for index in (startIndex + 1)...endIndex {
-                    value = value << 8
-                    value += UInt(storage.bytes[index])
-                }
-            }
-            value = value >> lsb  // FIXME: we may have overflowed at this point if lsb + width > UInt.bitWidth
+            var value = UInt(0)
 
+            var lsb = 0
+            var msb = self.msb
+            for index in stride(from: startIndex, through: endIndex, by: 1) {
+                if index == endIndex {
+                    lsb = self.lsb
+                }
+                let bitsToAddThisPass = msb - lsb + 1
+                value <<= bitsToAddThisPass
+                let mask = UInt8(truncatingIfNeeded: (0b1 << bitsToAddThisPass) - 1)
+                let bitsRead = (storage.bytes[index] >> lsb) & mask
+                value |= UInt(bitsRead)
+
+                msb = 7
+            }
             return extendingSign(of: value, fromPosition: encodedWidth)
         }
         set {
@@ -126,7 +131,7 @@ class MultiByteCoder: ByteCoder {
                 storage.bytes[index] = cleared | (chunk << lsb)
 
                 lsb = 0
-                remaining = remaining >> bitsConsumedInThisPass
+                remaining >>= bitsConsumedInThisPass
             }
         }
     }
