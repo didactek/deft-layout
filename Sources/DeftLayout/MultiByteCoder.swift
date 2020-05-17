@@ -113,9 +113,13 @@ class MultiByteCoder: ByteCoder {
 
             // chew off from the lsb:
             var lsb = self.lsb
-            for index in stride(from: endIndex, to: startIndex, by: -1) {
-                let bitsConsumedInThisPass = 8 - lsb
-                let mask = UInt8((0b1 << bitsConsumedInThisPass) - 1)
+            var msb = 7
+            for index in stride(from: endIndex, through: startIndex, by: -1) {
+                if index == startIndex {
+                    msb = self.msb
+                }
+                let bitsConsumedInThisPass = msb - lsb + 1
+                let mask = UInt8(truncatingIfNeeded: (0b1 << bitsConsumedInThisPass) - 1)
                 let cleared = storage.bytes[index] & ~(mask << lsb)
                 let chunk = UInt8(truncatingIfNeeded: remaining) & mask
                 storage.bytes[index] = cleared | (chunk << lsb)
@@ -123,10 +127,6 @@ class MultiByteCoder: ByteCoder {
                 lsb = 0
                 remaining = remaining >> bitsConsumedInThisPass
             }
-            assert(msb >= lsb, "should still be work left to do")
-            let mask = UInt8((0b10 << (msb - lsb)) - 1)
-            let cleared = storage.bytes[startIndex] & ~(mask << lsb)
-            storage.bytes[startIndex] = cleared | (UInt8(remaining) << lsb)
         }
     }
 }

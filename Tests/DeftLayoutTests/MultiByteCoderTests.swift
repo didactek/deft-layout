@@ -51,8 +51,10 @@ class MultiByteCoderTests: XCTestCase {
         coder.wideRepresentation = 9
         XCTAssertEqual(coder.wideRepresentation, 9)
 
-        coder.wideRepresentation = 13
-        XCTAssertEqual(coder.wideRepresentation, 13)
+        coder.wideRepresentation = 0b1101
+        XCTAssertEqual(coder.wideRepresentation, 0b1101)
+        XCTAssertEqual(bytes.bytes[0], 0b110)
+        XCTAssertEqual(bytes.bytes[1], 0b1_000_0000)
 
         coder.wideRepresentation = 1
         XCTAssertEqual(coder.wideRepresentation, 1)
