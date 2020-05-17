@@ -10,6 +10,7 @@
 import XCTest
 
 class MultiByteCoderTests: XCTestCase {
+    let bytes = AssembledMessage()
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -20,8 +21,6 @@ class MultiByteCoderTests: XCTestCase {
     }
 
     func testThreeByteSpan() throws {
-        let bytes = AssembledMessage()
-
         let coder = try! MultiByteCoder(significantByte: 2, msb: 4, minorByte: 5, lsb: 7, signed: false, storedIn: bytes) // object under test
 
 
@@ -40,8 +39,6 @@ class MultiByteCoderTests: XCTestCase {
     }
 
     func testAdjacentSpan() throws {
-        let bytes = AssembledMessage()
-
         let coder = try! MultiByteCoder(significantByte: 1, msb: 2, minorByte: 2, lsb: 7, signed: false, storedIn: bytes) // object under test
 
 
@@ -61,8 +58,6 @@ class MultiByteCoderTests: XCTestCase {
     }
 
     func testSingleByte() throws {
-        let bytes = AssembledMessage()
-
         let coder = try! MultiByteCoder(significantByte: 2, msb: 3, minorByte: 2, lsb: 0, signed: false, storedIn: bytes) // object under test
 
 
@@ -80,13 +75,30 @@ class MultiByteCoderTests: XCTestCase {
     }
 
     func testSpanning64BitUnsigned() throws {
-        let bytes = AssembledMessage()
-
         // 64 bits offset by 4 bits
-        let coder = try! MultiByteCoder(significantByte: 1, msb: 3, minorByte: 9, lsb: 4, signed: false, storedIn: bytes)
+        let coder = try! MultiByteCoder(significantByte: 1, msb: 3, minorByte: 9, lsb: 4, signed: false, storedIn: bytes) // object under test
 
         let reallyBig = UInt64.max - 2
         coder.wideRepresentation = UInt(reallyBig)
         XCTAssertEqual(UInt64(coder.wideRepresentation), reallyBig)
+    }
+
+    func testLittleEndian() throws {
+        // three bits in major; one bit in minor
+        let coder = try! MultiByteCoder(significantByte: 2, msb: 2, minorByte: 1, lsb: 7, signed: false, storedIn: bytes, littleEndian: true) // object under test
+
+        coder.wideRepresentation = 0
+        XCTAssertEqual(coder.wideRepresentation, 0)
+
+        coder.wideRepresentation = 9
+        XCTAssertEqual(coder.wideRepresentation, 9)
+
+        coder.wideRepresentation = 0b1101
+        XCTAssertEqual(coder.wideRepresentation, 0b1101)
+        XCTAssertEqual(bytes.bytes[0], 0b1_000_0000, "least significant bit encoded in first byte")
+        XCTAssertEqual(bytes.bytes[1], 0b110, "most-significant bits encoded in second byte")
+
+        coder.wideRepresentation = 1
+        XCTAssertEqual(coder.wideRepresentation, 1)
     }
 }

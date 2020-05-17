@@ -16,11 +16,20 @@ class MultiByteCoder: ByteCoder {
     let msb: Int
     let lsb: Int
     let isSigned: Bool
+    let littleEndian: Bool
 
-    init(significantByte: Int, msb: Int, minorByte: Int, lsb: Int, signed: Bool, storedIn: AssembledMessage) throws {
+    init(significantByte: Int, msb: Int, minorByte: Int, lsb: Int, signed: Bool, storedIn: AssembledMessage, littleEndian: Bool = false) throws {
         guard significantByte > 0 else { throw BitfieldRangeError.badByteIndex }
-        guard significantByte <= minorByte else { throw BitfieldRangeError.badByteIndex }
-        guard significantByte < minorByte || msb >= lsb else { throw BitfieldRangeError.bitOrdering }
+        guard minorByte > 0 else { throw BitfieldRangeError.badByteIndex }
+
+        if !littleEndian {
+            guard significantByte <= minorByte else { throw BitfieldRangeError.badByteIndex }
+            guard significantByte < minorByte || msb >= lsb else { throw BitfieldRangeError.bitOrdering }
+        }
+        else {
+            guard significantByte >= minorByte else { throw BitfieldRangeError.badByteIndex }
+            guard significantByte > minorByte || msb >= lsb else { throw BitfieldRangeError.bitOrdering }
+        }
 
         guard msb >= 0 else { throw BitfieldRangeError.byteWidthExceeded }
         guard msb < 8 else { throw BitfieldRangeError.byteWidthExceeded }
@@ -34,6 +43,7 @@ class MultiByteCoder: ByteCoder {
         self.msb = msb
         self.lsb = lsb
         self.isSigned = signed
+        self.littleEndian = littleEndian
     }
 
     // FIXME: unify 'raw' and 'encoded' terminology
@@ -80,7 +90,7 @@ class MultiByteCoder: ByteCoder {
 
             var lsb = 0
             var msb = self.msb
-            for index in stride(from: startIndex, through: endIndex, by: 1) {
+            for index in stride(from: startIndex, through: endIndex, by: littleEndian ? -1 : 1 ) {
                 if index == endIndex {
                     lsb = self.lsb
                 }
@@ -112,7 +122,7 @@ class MultiByteCoder: ByteCoder {
 
 
             // grow storage:
-            while storage.bytes.count <= endIndex {
+            while storage.bytes.count <= max(endIndex, startIndex) {
                 storage.bytes.append(0)
             }
 
@@ -120,7 +130,7 @@ class MultiByteCoder: ByteCoder {
             // chew off from the lsb:
             var lsb = self.lsb
             var msb = 7
-            for index in stride(from: endIndex, through: startIndex, by: -1) {
+            for index in stride(from: endIndex, through: startIndex, by: littleEndian ? 1 : -1) {
                 if index == startIndex {
                     msb = self.msb
                 }
