@@ -17,6 +17,9 @@ import Foundation
 ///
 /// - SeeAlso: `BitStorageCore`, `ByteCoder`
 class AssembledMessage {
+    /// Buffer of UInt8 for sending or receiving a message, in wire order.
+    ///
+    /// Interpretation of endian-ness should be done by `ByteCoder`s.
     var bytes = Data()
 
     // During their initialization, derived classes copy references to this underlying representation
