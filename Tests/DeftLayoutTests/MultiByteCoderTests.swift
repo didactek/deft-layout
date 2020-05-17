@@ -78,4 +78,15 @@ class MultiByteCoderTests: XCTestCase {
         coder.wideRepresentation = 1
         XCTAssertEqual(coder.wideRepresentation, 1)
     }
+
+    func testSpanning64BitUnsigned() throws {
+        let bytes = AssembledMessage()
+
+        // 64 bits offset by 4 bits
+        let coder = try! MultiByteCoder(significantByte: 1, msb: 3, minorByte: 9, lsb: 4, signed: false, storedIn: bytes)
+
+        let reallyBig = UInt64.max - 2
+        coder.wideRepresentation = UInt(reallyBig)
+        XCTAssertEqual(UInt64(coder.wideRepresentation), reallyBig)
+    }
 }

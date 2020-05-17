@@ -48,7 +48,8 @@ class MultiByteCoder: ByteCoder {
 
     /// Mask with (high) bits that cannot be encoded set to 1.
     var excessMask: UInt {
-        let valueMask = (UInt(1) << encodedWidth) - 1
+        var valueMask = UInt(1) << encodedWidth
+        valueMask &-= 1
         return ~valueMask
     }
 
