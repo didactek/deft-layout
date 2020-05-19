@@ -17,21 +17,10 @@ class ByteArrayDescription: BitStorageCore {
     }
 
     @propertyWrapper
-    struct position<T: BitEmbeddable> {
+    // I think this is a compiler bug: compiler checks for wrappedValue before filling in the extensions in scope:
+    // Property wrapper type 'ByteArrayDescription.position' does not contain a non-static property named 'wrappedValue'
+    struct position<T: BitEmbeddable>: CoderAdapter {
         var coder: ByteCoder
-
-        var wrappedValue: T {
-            get {
-                T(rawValue: T.RawValue(truncatingIfNeeded: coder.wideRepresentation))!
-            }
-            set {
-                // for signed quantities, we deal with sign extension here, where we have
-                // access to T.RawValue's width. N.B. RawValue is always unsigned, so
-                // the truncatingIfNeeded functions won't extend sign for us.
-                let raw = coder.extendingSign(of: UInt(truncatingIfNeeded: newValue.rawValue), fromPosition: T.RawValue.bitWidth)
-                coder.wideRepresentation = raw
-            }
-        }
 
         init(wrappedValue: T, significantByte: Int, msb: Int,
              minorByte: Int, lsb: Int,
