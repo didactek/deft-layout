@@ -14,7 +14,7 @@ import Foundation
 class SMBusWord {
     static var byteWidth: Int = 2
 
-    // FIXM: storage rotation pattern copied from BitStorageCore. Should factor.
+    // FIXME: storage rotation pattern copied from BitStorageCore. Should factor.
     let storage: AssembledMessage
     init() {
         storage = AssembledMessage.freezeAndRotateStorage()
@@ -45,8 +45,8 @@ class SMBusWord {
         }
 
         init(wrappedValue: T, msb: Int, lsb: Int, _ options: PositionOptions = []) {
-            assert(lsb >= 0 && lsb <= 15)
-            assert(lsb >= 0 && lsb <= 15)
+            assert(msb >= 0 && msb < (SMBusWord.byteWidth * 8))
+            assert(lsb >= 0 && lsb < (SMBusWord.byteWidth * 8))
             assert(msb >= lsb)
 
             let (msbDistanceToEnd, msbOffset) = msb.quotientAndRemainder(dividingBy: 8)
