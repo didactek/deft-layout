@@ -11,21 +11,14 @@ import Foundation
 
 
 /// Encode a 16-bit, little-endian word (or fractions thereof) for SMBus use.
-class SMBusWord {
+class SMBusWord: BitStorageCore {
     static var byteWidth: Int = 2
-
-    // FIXME: storage rotation pattern copied from BitStorageCore. Should factor.
-    let storage: AssembledMessage
-    init() {
-        storage = AssembledMessage.freezeAndRotateStorage()
-    }
 
     struct PositionOptions: OptionSet {
         let rawValue: Int
 
         static let extendNegativeBit = PositionOptions(rawValue: 1 << 0)
     }
-
 
     @propertyWrapper
     struct position<T: BitEmbeddable> {

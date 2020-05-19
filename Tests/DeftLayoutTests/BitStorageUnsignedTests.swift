@@ -10,7 +10,7 @@
 import XCTest
 
 class BitStorageUnsignedTests: XCTestCase {
-    class UnsignedRange: BitStorageCore {
+    class UnsignedRange: ByteArrayDescription {
         @position(ofByte: 1, msb: 7, lsb: 4)
         var highNibble: UInt8 = 0b1010
 

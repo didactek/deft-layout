@@ -10,7 +10,7 @@
 import XCTest
 
 class BitStorageBoolTests: XCTestCase {
-    class BoolAndBit: BitStorageCore {
+    class BoolAndBit: ByteArrayDescription {
         @position(ofByte: 1, bit: 7)
         var msb = true
 
