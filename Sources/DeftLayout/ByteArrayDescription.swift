@@ -46,7 +46,6 @@ class ByteArrayDescription: BitStorageCore {
         }
 
         // FIXME: additional usage:
-        // word-oriented positions (might be a separate wrapper?) (refactor MCP9808 to use)
         // whole-byte positions?
         // Fixed-point fractionals (again: separate wrapper)
     }
