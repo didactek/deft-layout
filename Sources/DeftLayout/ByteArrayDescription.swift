@@ -17,7 +17,7 @@ class ByteArrayDescription: BitStorageCore {
     }
 
     @propertyWrapper
-    struct position<T: BitEmbeddable> {
+    struct Position<T: BitEmbeddable> {
         var coder: ByteCoder
 
         var wrappedValue: T {

@@ -11,13 +11,13 @@ import XCTest
 
 class BitStorageUnsignedTests: XCTestCase {
     class UnsignedRange: ByteArrayDescription {
-        @position(ofByte: 1, msb: 7, lsb: 4)
+        @Position(ofByte: 1, msb: 7, lsb: 4)
         var highNibble: UInt8 = 0b1010
 
-        @position(ofByte: 1, msb: 3, lsb: 2)
+        @Position(ofByte: 1, msb: 3, lsb: 2)
         var midWord: UInt8 = 0b00
 
-        @position(ofByte: 1, msb: 1, lsb: 0)
+        @Position(ofByte: 1, msb: 1, lsb: 0)
         var lastWord: Int8 = 0b11
     }
     var coder = UnsignedRange()  // object under test

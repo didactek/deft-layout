@@ -11,13 +11,13 @@ import XCTest
 
 class BitStorageBoolTests: XCTestCase {
     class BoolAndBit: ByteArrayDescription {
-        @position(ofByte: 1, bit: 7)
+        @Position(ofByte: 1, bit: 7)
         var msb = true
 
-        @position(ofByte: 1, bit: 0)
+        @Position(ofByte: 1, bit: 0)
         var lsb = false
 
-        @position(ofByte: 1, bit: 2)
+        @Position(ofByte: 1, bit: 2)
         var mid = true
     }
     let coder = BoolAndBit()  // object under test

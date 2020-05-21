@@ -13,16 +13,16 @@ class BitStorageSignedTests: XCTestCase {
     typealias SmallSigned = Int16 // or Int8
 
     class SignedRange: ByteArrayDescription {
-        @position(ofByte: 1, msb: 7, lsb: 4, .extendNegativeBit)
+        @Position(ofByte: 1, msb: 7, lsb: 4, .extendNegativeBit)
         var highNibble: SmallSigned = 0
 
-        @position(ofByte: 2, msb: 5, lsb: 2, .extendNegativeBit)
+        @Position(ofByte: 2, msb: 5, lsb: 2, .extendNegativeBit)
         var midNibble: SmallSigned = 0
 
-        @position(ofByte: 3, msb: 3, lsb: 0, .extendNegativeBit)
+        @Position(ofByte: 3, msb: 3, lsb: 0, .extendNegativeBit)
         var lowNibble: SmallSigned = 0
 
-        @position(ofByte: 4, msb: 6, lsb: 1, .extendNegativeBit)
+        @Position(ofByte: 4, msb: 6, lsb: 1, .extendNegativeBit)
         var sixBits: SmallSigned = 0
     }
     var coder = SignedRange()  // object under test
