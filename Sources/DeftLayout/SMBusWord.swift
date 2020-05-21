@@ -21,20 +21,12 @@ class SMBusWord: BitStorageCore {
     }
 
     @propertyWrapper
-    struct Position<T: BitEmbeddable> {
+    struct Position<T: BitEmbeddable>: CoderAdapter {
         var coder: ByteCoder
 
         var wrappedValue: T {
-            get {
-                T(rawValue: T.RawValue(truncatingIfNeeded: coder.wideRepresentation))!
-            }
-            set {
-                // for signed quantities, we deal with sign extension here, where we have
-                // access to T.RawValue's width. N.B. RawValue is always unsigned, so
-                // the truncatingIfNeeded functions won't extend sign for us.
-                let raw = coder.extendingSign(of: UInt(truncatingIfNeeded: newValue.rawValue), fromPosition: T.RawValue.bitWidth)
-                coder.wideRepresentation = raw
-            }
+            get { decodedValue}
+            set { decodedValue = newValue }
         }
 
         init(wrappedValue: T, msb: Int, lsb: Int, _ options: PositionOptions = []) {

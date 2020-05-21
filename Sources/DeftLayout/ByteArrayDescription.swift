@@ -33,7 +33,7 @@ class ByteArrayDescription: BitStorageCore {
                                              minorByte: minorByte, lsb: lsb,
                                              signed: options.contains(.extendNegativeBit),
                                              storedIn: AssembledMessage.storageBuildInProgress())
-            self.decodedValue = wrappedValue
+            self.wrappedValue = wrappedValue
         }
 
         init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
