@@ -13,11 +13,14 @@ protocol CoderAdapter {
     associatedtype T: BitEmbeddable
     var coder: ByteCoder { get set }
 
-    var wrappedValue: T { get set }
+    var decodedValue: T { get set }
 }
 
 extension CoderAdapter {
-    var wrappedValue: T {
+    // I think there is a compiler bug: in instantiating property wrappers, the compiler checks for wrappedValue before filling in the extensions in scope, giving the error:
+    // Property wrapper type 'ByteArrayDescription.position' does not contain a non-static property named 'wrappedValue'
+    // One can work around this by creating an extension that provides a value with a different name and forward to it:
+    var decodedValue /*wrappedValue*/: T {
         get {
             T(rawValue: T.RawValue(truncatingIfNeeded: coder.wideRepresentation))!
         }

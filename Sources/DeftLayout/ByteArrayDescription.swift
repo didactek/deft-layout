@@ -17,10 +17,13 @@ class ByteArrayDescription: BitStorageCore {
     }
 
     @propertyWrapper
-    // I think this is a compiler bug: compiler checks for wrappedValue before filling in the extensions in scope:
-    // Property wrapper type 'ByteArrayDescription.position' does not contain a non-static property named 'wrappedValue'
     struct position<T: BitEmbeddable>: CoderAdapter {
         var coder: ByteCoder
+
+        var wrappedValue: T {
+            get { decodedValue}
+            set { decodedValue = newValue }
+        }
 
         init(wrappedValue: T, significantByte: Int, msb: Int,
              minorByte: Int, lsb: Int,
@@ -30,7 +33,7 @@ class ByteArrayDescription: BitStorageCore {
                                              minorByte: minorByte, lsb: lsb,
                                              signed: options.contains(.extendNegativeBit),
                                              storedIn: AssembledMessage.storageBuildInProgress())
-            self.wrappedValue = wrappedValue
+            self.decodedValue = wrappedValue
         }
 
         init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
