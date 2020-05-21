@@ -36,8 +36,8 @@ class WordDescription: BitStorageCore {
             let (msbDistanceToEnd, msbOffset) = msb.quotientAndRemainder(dividingBy: 8)
             let (lsbDistanceToEnd, lsbOffset) = lsb.quotientAndRemainder(dividingBy: 8)
 
-            self.coder = try! MultiByteCoder(significantByte: WordDescription.byteWidth - msbDistanceToEnd, msb: msbOffset,
-                                             minorByte: WordDescription.byteWidth - lsbDistanceToEnd, lsb: lsbOffset,
+            self.coder = try! MultiByteCoder(significantByte: WordDescription.byteWidth - msbDistanceToEnd - 1, msb: msbOffset,
+                                             minorByte: WordDescription.byteWidth - lsbDistanceToEnd - 1, lsb: lsbOffset,
                                              signed: options.contains(.extendNegativeBit),
                                              storedIn: AssembledMessage.storageBuildInProgress(),
                                              littleEndian: false
