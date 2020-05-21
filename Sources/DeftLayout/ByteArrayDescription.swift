@@ -17,20 +17,12 @@ class ByteArrayDescription: BitStorageCore {
     }
 
     @propertyWrapper
-    struct Position<T: BitEmbeddable> {
+    struct Position<T: BitEmbeddable>: CoderAdapter {
         var coder: ByteCoder
 
         var wrappedValue: T {
-            get {
-                T(rawValue: T.RawValue(truncatingIfNeeded: coder.wideRepresentation))!
-            }
-            set {
-                // for signed quantities, we deal with sign extension here, where we have
-                // access to T.RawValue's width. N.B. RawValue is always unsigned, so
-                // the truncatingIfNeeded functions won't extend sign for us.
-                let raw = coder.extendingSign(of: UInt(truncatingIfNeeded: newValue.rawValue), fromPosition: T.RawValue.bitWidth)
-                coder.wideRepresentation = raw
-            }
+            get { decodedValue}
+            set { decodedValue = newValue }
         }
 
         init(wrappedValue: T, significantByte: Int, msb: Int,
@@ -41,7 +33,7 @@ class ByteArrayDescription: BitStorageCore {
                                              minorByte: minorByte, lsb: lsb,
                                              signed: options.contains(.extendNegativeBit),
                                              storedIn: AssembledMessage.storageBuildInProgress())
-            self.wrappedValue = wrappedValue
+            self.decodedValue = wrappedValue
         }
 
         init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
