@@ -19,8 +19,8 @@ class MultiByteCoder: ByteCoder {
     let littleEndian: Bool
 
     init(significantByte: Int, msb: Int, minorByte: Int, lsb: Int, signed: Bool, storedIn: AssembledMessage, littleEndian: Bool = false) throws {
-        guard significantByte > 0 else { throw BitfieldRangeError.badByteIndex }
-        guard minorByte > 0 else { throw BitfieldRangeError.badByteIndex }
+        guard significantByte >= 0 else { throw BitfieldRangeError.badByteIndex }
+        guard minorByte >= 0 else { throw BitfieldRangeError.badByteIndex }
 
         if !littleEndian {
             guard significantByte <= minorByte else { throw BitfieldRangeError.badByteIndex }
@@ -38,8 +38,8 @@ class MultiByteCoder: ByteCoder {
 
         storage = storedIn
 
-        self.mostSignificantByteIndex = significantByte - 1
-        self.leastSignificantByteIndex = minorByte - 1
+        self.mostSignificantByteIndex = significantByte
+        self.leastSignificantByteIndex = minorByte
         self.msb = msb
         self.lsb = lsb
         self.isSigned = signed

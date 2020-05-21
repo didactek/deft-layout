@@ -30,8 +30,8 @@ class BitStorageSubByteTests: XCTestCase {
         XCTAssertThrowsError( try MultiByteCoder(significantByte: 1, msb: 2, minorByte: 1, lsb: -1, signed: false, storedIn: storage),
                               "lsb must not be negative" )
 
-        XCTAssertThrowsError( try MultiByteCoder(significantByte: 0, msb: 3, minorByte: 0, lsb: 3, signed: false, storedIn: storage),
-                              "byte offset is one-indexed; zero or below should be disallowed" )
+        XCTAssertThrowsError( try MultiByteCoder(significantByte: -1, msb: 3, minorByte: 0, lsb: 3, signed: false, storedIn: storage),
+                              "MultyByteCoder uses zero-indexed offset; negative index should be disallowed" )
     }
 
 

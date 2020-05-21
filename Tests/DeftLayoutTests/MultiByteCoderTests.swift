@@ -21,7 +21,7 @@ class MultiByteCoderTests: XCTestCase {
     }
 
     func testThreeByteSpan() throws {
-        let coder = try! MultiByteCoder(significantByte: 2, msb: 4, minorByte: 5, lsb: 7, signed: false, storedIn: bytes) // object under test
+        let coder = try! MultiByteCoder(significantByte: 1, msb: 4, minorByte: 4, lsb: 7, signed: false, storedIn: bytes) // object under test
 
 
         coder.wideRepresentation = 0
@@ -39,7 +39,7 @@ class MultiByteCoderTests: XCTestCase {
     }
 
     func testAdjacentSpan() throws {
-        let coder = try! MultiByteCoder(significantByte: 1, msb: 2, minorByte: 2, lsb: 7, signed: false, storedIn: bytes) // object under test
+        let coder = try! MultiByteCoder(significantByte: 0, msb: 2, minorByte: 1, lsb: 7, signed: false, storedIn: bytes) // object under test
 
 
         coder.wideRepresentation = 0
@@ -58,7 +58,7 @@ class MultiByteCoderTests: XCTestCase {
     }
 
     func testSingleByte() throws {
-        let coder = try! MultiByteCoder(significantByte: 2, msb: 3, minorByte: 2, lsb: 0, signed: false, storedIn: bytes) // object under test
+        let coder = try! MultiByteCoder(significantByte: 1, msb: 3, minorByte: 1, lsb: 0, signed: false, storedIn: bytes) // object under test
 
 
         coder.wideRepresentation = 0
@@ -76,7 +76,7 @@ class MultiByteCoderTests: XCTestCase {
 
     func testSpanning64BitUnsigned() throws {
         // 64 bits offset by 4 bits
-        let coder = try! MultiByteCoder(significantByte: 1, msb: 3, minorByte: 9, lsb: 4, signed: false, storedIn: bytes) // object under test
+        let coder = try! MultiByteCoder(significantByte: 0, msb: 3, minorByte: 8, lsb: 4, signed: false, storedIn: bytes) // object under test
 
         let reallyBig = UInt64.max - 2
         coder.wideRepresentation = UInt(reallyBig)
@@ -85,7 +85,7 @@ class MultiByteCoderTests: XCTestCase {
 
     func testLittleEndian() throws {
         // three bits in major; one bit in minor
-        let coder = try! MultiByteCoder(significantByte: 2, msb: 2, minorByte: 1, lsb: 7, signed: false, storedIn: bytes, littleEndian: true) // object under test
+        let coder = try! MultiByteCoder(significantByte: 1, msb: 2, minorByte: 0, lsb: 7, signed: false, storedIn: bytes, littleEndian: true) // object under test
 
         coder.wideRepresentation = 0
         XCTAssertEqual(coder.wideRepresentation, 0)

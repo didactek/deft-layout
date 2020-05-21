@@ -29,8 +29,8 @@ class ByteArrayDescription: BitStorageCore {
              minorByte: Int, lsb: Int,
              _ options: PositionOptions = []) {
 
-            self.coder = try! MultiByteCoder(significantByte: significantByte, msb: msb,
-                                             minorByte: minorByte, lsb: lsb,
+            self.coder = try! MultiByteCoder(significantByte: significantByte - 1, msb: msb,
+                                             minorByte: minorByte - 1, lsb: lsb,
                                              signed: options.contains(.extendNegativeBit),
                                              storedIn: AssembledMessage.storageBuildInProgress())
             self.wrappedValue = wrappedValue
