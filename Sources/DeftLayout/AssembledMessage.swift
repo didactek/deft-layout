@@ -16,11 +16,11 @@ import Foundation
 /// Individual bits are read/written by `@Position` properties of subclasses of `BitStorageCore`.
 ///
 /// - SeeAlso: `BitStorageCore`, `ByteCoder`
-class AssembledMessage {
+public class AssembledMessage {
     /// Buffer of UInt8 for sending or receiving a message, in wire order.
     ///
     /// Interpretation of endian-ness should be done by `ByteCoder`s.
-    var bytes = Data()
+    public var bytes = Data()
 
     // During their initialization, derived classes copy references to this underlying representation
     // for their property wrappers...

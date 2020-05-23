@@ -11,8 +11,8 @@
 import Foundation
 
 
-class BitStorageCore {
-    let storage: AssembledMessage
+open class BitStorageCore {
+    public let storage: AssembledMessage
 
     init() {
         storage = AssembledMessage.freezeAndRotateStorage()

@@ -9,26 +9,34 @@
 
 import Foundation
 
-class ByteDescription: BitStorageCore {
+open class ByteDescription: BitStorageCore {
+    public override init() {
+        super.init()
+    }
+
     static var byteWidth: Int = 1
 
-    struct PositionOptions: OptionSet {
-        let rawValue: Int
+    public struct PositionOptions: OptionSet {
+        public let rawValue: Int
+
+        public init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
 
         static let extendNegativeBit = PositionOptions(rawValue: 1 << 0)
     }
 
     @propertyWrapper
-    struct Position<T: BitEmbeddable>: CoderAdapter {
+    public struct Position<T: BitEmbeddable>: CoderAdapter {
         var coder: ByteCoder
 
-        var wrappedValue: T {
+        public var wrappedValue: T {
             get { decodedValue}
             set { decodedValue = newValue }
         }
 
         // FIXME: either simplify this or factor common init work into protocol
-        init(wrappedValue: T, msb: Int, lsb: Int, _ options: PositionOptions = []) {
+        public init(wrappedValue: T, msb: Int, lsb: Int, _ options: PositionOptions = []) {
             assert(msb >= 0 && msb < (ByteDescription.byteWidth * 8))
             assert(lsb >= 0 && lsb < (ByteDescription.byteWidth * 8))
             assert(msb >= lsb)
@@ -45,7 +53,7 @@ class ByteDescription: BitStorageCore {
             self.wrappedValue = wrappedValue
         }
 
-        init(wrappedValue: T, bit: Int) {
+        public init(wrappedValue: T, bit: Int) {
             self.init(wrappedValue: wrappedValue, msb: bit, lsb: bit)
         }
     }

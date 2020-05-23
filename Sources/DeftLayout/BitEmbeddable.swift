@@ -11,7 +11,7 @@ import Foundation
 
 
 /// Note: protocol is a subset of RawRepresentable so enums can comply just by mentioning this protocol
-protocol BitEmbeddable {
+public protocol BitEmbeddable {
     associatedtype RawValue: FixedWidthInteger
     init?(rawValue: RawValue)
     var rawValue: RawValue { get }

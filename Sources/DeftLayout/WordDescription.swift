@@ -10,25 +10,33 @@
 import Foundation
 
 /// Encode a 16-bit, big-endian word (or fractions thereof) for SMBus use.
-class WordDescription: BitStorageCore {
+open class WordDescription: BitStorageCore {
+    public override init() {
+        super.init()
+    }
+
     static var byteWidth: Int = 2
 
-    struct PositionOptions: OptionSet {
-        let rawValue: Int
+    public struct PositionOptions: OptionSet {
+        public let rawValue: Int
 
-        static let extendNegativeBit = PositionOptions(rawValue: 1 << 0)
+        public init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
+
+        public static let extendNegativeBit = PositionOptions(rawValue: 1 << 0)
     }
 
     @propertyWrapper
-    struct Position<T: BitEmbeddable>: CoderAdapter {
+    public struct Position<T: BitEmbeddable>: CoderAdapter {
         var coder: ByteCoder
 
-        var wrappedValue: T {
+        public var wrappedValue: T {
             get { decodedValue}
             set { decodedValue = newValue }
         }
 
-        init(wrappedValue: T, msb: Int, lsb: Int, _ options: PositionOptions = []) {
+        public init(wrappedValue: T, msb: Int, lsb: Int, _ options: PositionOptions = []) {
             assert(msb >= 0 && msb < (WordDescription.byteWidth * 8))
             assert(lsb >= 0 && lsb < (WordDescription.byteWidth * 8))
             assert(msb >= lsb)
@@ -45,7 +53,7 @@ class WordDescription: BitStorageCore {
             self.wrappedValue = wrappedValue
         }
 
-        init(wrappedValue: T, bit: Int) {
+        public init(wrappedValue: T, bit: Int) {
             self.init(wrappedValue: wrappedValue, msb: bit, lsb: bit)
         }
     }

@@ -9,23 +9,31 @@
 
 import Foundation
 
-class ByteArrayDescription: BitStorageCore {
-    struct PositionOptions: OptionSet {
-        let rawValue: Int
+open class ByteArrayDescription: BitStorageCore {
+    public override init() {
+        super.init()
+    }
 
-        static let extendNegativeBit = PositionOptions(rawValue: 1 << 0)
+    public struct PositionOptions: OptionSet {
+        public let rawValue: Int
+
+        public init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
+
+        public static let extendNegativeBit = PositionOptions(rawValue: 1 << 0)
     }
 
     @propertyWrapper
-    struct Position<T: BitEmbeddable>: CoderAdapter {
+    public struct Position<T: BitEmbeddable>: CoderAdapter {
         var coder: ByteCoder
 
-        var wrappedValue: T {
+        public var wrappedValue: T {
             get { decodedValue}
             set { decodedValue = newValue }
         }
 
-        init(wrappedValue: T, significantByte: Int, msb: Int,
+        public init(wrappedValue: T, significantByte: Int, msb: Int,
              minorByte: Int, lsb: Int,
              _ options: PositionOptions = []) {
 
@@ -36,12 +44,12 @@ class ByteArrayDescription: BitStorageCore {
             self.wrappedValue = wrappedValue
         }
 
-        init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
+        public init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
             self.init(wrappedValue: wrappedValue, significantByte: ofByte, msb: msb,
                       minorByte: ofByte, lsb: lsb, options)
         }
 
-        init(wrappedValue: T, ofByte: Int, bit: Int) {
+        public init(wrappedValue: T, ofByte: Int, bit: Int) {
             self.init(wrappedValue: wrappedValue, ofByte: ofByte, msb: bit, lsb: bit, [])
         }
 
