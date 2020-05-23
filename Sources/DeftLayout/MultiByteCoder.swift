@@ -107,12 +107,6 @@ class MultiByteCoder: ByteCoder {
         set {
             var remaining = newValue
 
-            if isSigned{
-                print("value:", Int(truncatingIfNeeded: newValue),
-                      "as:", String(newValue, radix: 2),
-                      "signBit:", String(signBitMaskedWide, radix: 2),
-                      "mask", String(excessMask, radix: 2))
-            }
             if isSigned && (newValue & signBitMaskedWide != 0) {
                 assert( (remaining & excessMask) == excessMask, "negative number too negative to fit in allocated bits")
                 remaining = remaining & ~excessMask  // clear the sign extension that won't appear in the encoded value

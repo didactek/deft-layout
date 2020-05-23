@@ -8,6 +8,7 @@
 //
 
 import XCTest
+@testable import DeftLayout
 
 class BitStorageSignedTests: XCTestCase {
     typealias SmallSigned = Int16 // or Int8

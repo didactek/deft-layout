@@ -8,6 +8,7 @@
 //
 
 import XCTest
+@testable import DeftLayout
 
 class BitStorageMemoryTests: XCTestCase {
 

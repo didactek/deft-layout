@@ -8,6 +8,7 @@
 //
 
 import XCTest
+@testable import DeftLayout
 
 class BitStorageUnsignedTests: XCTestCase {
     class UnsignedRange: ByteArrayDescription {
