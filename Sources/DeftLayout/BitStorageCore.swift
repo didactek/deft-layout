@@ -1,6 +1,6 @@
 //
 //  BitStorageCore.swift
-//  radio
+//  Deft -- DEvices from swiFT
 //
 //  Created by Kit Transue on 2020-05-03.
 //  Prototyped 2020-05-02 in BitManip project
