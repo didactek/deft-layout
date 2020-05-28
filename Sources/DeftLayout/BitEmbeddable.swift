@@ -24,7 +24,7 @@ public protocol BitEmbeddable {
 // extension FixedWidthInteger: BitEmbeddable ...
 // extension RawRepresentable: BitEmbeddable where RawValue: UInt8
 //
-// As of Swift 5.1, extending protocols in this way is not part of the language, but there is discussion surrounding it. It would be useful (and expressive) in cases like this, but it would also complicate runtime facets of the type system. For more, see:
+// As of Swift 5.2, extending protocols in this way is not part of the language, but there is discussion surrounding it. It would be useful (and expressive) in cases like this, but it would also complicate runtime facets of the type system. For more, see:
 // https://github.com/apple/swift/blob/main/docs/GenericsManifesto.md#retroactive-protocol-refinement
 
 

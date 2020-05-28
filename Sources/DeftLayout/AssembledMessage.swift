@@ -25,17 +25,27 @@ public class AssembledMessage {
     // During their initialization, derived classes copy references to this underlying representation
     // for their property wrappers...
     private static var _storage = AssembledMessage()
-    // ...after which the base class BitStorageCore initializer rolls the static storage over for the next instantiation. This means there is always a yet-to-be-used Storage lying in wait.
+
+    /// End the sharing provided by `storageBuildInProgress` and prepare to serve a new batch of owners.
     static func freezeAndRotateStorage() -> AssembledMessage {
         let tmp = _storage
         _storage = AssembledMessage()
         return tmp
     }
-    // FIXME: What would be cool: proof of use in a ByteCoder required for access.
-    // This could be useful in debug prints of storage that decode object.
-    // But it's not obvious how to implement this because it's a chicken-and-egg problem: you can't prove
-    // you are a coder until you make one, and that requires a storage handle.
-    // Same for self.
+
+    /// Obtain a reference to the current AssembledMessage instance.
+    ///
+    /// The property wrappers that want to manage a fraction of the shared Assembled Message obtain
+    /// that AssembledMessage through this function.
+    ///
+    /// Important: To have all the properties and the base class end up with exclusive and consistent access to
+    /// one AssembledMessage, the property wrappers must all be constructed first, and then
+    /// `freezeAndRotateStorage` must be called. Because Swift requries that all properties be
+    /// assigned at least some value before super.init is called, the `freezeAndRotateStorage` can be
+    /// placed in the layout superclass. This pattern is provided when deriving from `BitStorageCore`.
+    ///
+    /// Important: This uses a static pool and is not thread-safe. Initialize in turn each object sharing AssembledMessages
+    /// with its properties.
     static func storageBuildInProgress(/*coder _: ByteCoder*/) -> AssembledMessage {
         return _storage
     }

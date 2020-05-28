@@ -9,7 +9,7 @@
 
 import Foundation
 
-/// Encode a 16-bit, big-endian word (or fractions thereof) for SMBus use.
+/// Encode a 16-bit, big-endian word (or fractions thereof)
 open class WordDescription: BitStorageCore {
     public override init() {
         super.init()
