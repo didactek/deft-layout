@@ -10,13 +10,13 @@
 import Foundation
 
 class MultiByteCoder: ByteCoder {
-    let storage: AssembledMessage
-    let mostSignificantByteIndex: Int
-    let leastSignificantByteIndex: Int
-    let msb: Int
-    let lsb: Int
-    let isSigned: Bool
-    let littleEndian: Bool
+    private let storage: AssembledMessage
+    private let mostSignificantByteIndex: Int
+    private let leastSignificantByteIndex: Int
+    private let msb: Int
+    private let lsb: Int
+    private let isSigned: Bool
+    private let littleEndian: Bool
 
     init(significantByte: Int, msb: Int, minorByte: Int, lsb: Int, signed: Bool, storedIn: AssembledMessage, littleEndian: Bool = false) throws {
         guard significantByte >= 0 else { throw BitfieldRangeError.badByteIndex }
@@ -52,19 +52,19 @@ class MultiByteCoder: ByteCoder {
     // terminology: "Mask" suggests 0 or more bits set; MaskedBit
 
     /// Count of bits available for coding.
-    var encodedWidth: Int {
+    private var encodedWidth: Int {
         8 * (leastSignificantByteIndex - mostSignificantByteIndex) + msb - lsb + 1
     }
 
     /// Mask with (high) bits that cannot be encoded set to 1.
-    var excessMask: UInt {
+    private var excessMask: UInt {
         var valueMask = UInt(1) << encodedWidth
         valueMask &-= 1
         return ~valueMask
     }
 
 
-    var signBitMaskedWide: UInt {
+    private var signBitMaskedWide: UInt {
         UInt(1) << (UInt.bitWidth - 1)
     }
 
