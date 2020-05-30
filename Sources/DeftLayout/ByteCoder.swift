@@ -16,10 +16,12 @@ protocol ByteCoder {
     /// Extract raw value from its store and represent as a full-width UInt.
     var wideRepresentation: UInt { get set }
 
-    /// Interpret fromPosition as a sign bit, and set all bits above that to the same value.
+    /// Extend the sign bit of a BitEmbeddable value **if appropriate for the intemediate type**.
     ///
-    /// If the extended value is reinterpreted as a signed Int, it will be negative if the fromPosition bit was set.
-    func extendingSign(of rawValue: UInt, fromPosition bit: Int) -> UInt
+    /// This is used when converting a BitEmbeddable RawValue type to a UInt for storage or conversion.
+    /// If the ByteCoder is encoding an unsigned type, then this will return the rawValue passed to it.
+    /// If the ByteCoder encodes a signed type and the fromPosition bit is set, the sign is extended to the width of the UInt.
+    func extendingSignIfNeeded(of rawValue: UInt, fromPosition bit: Int) -> UInt
 }
 
 enum BitfieldRangeError: Error {

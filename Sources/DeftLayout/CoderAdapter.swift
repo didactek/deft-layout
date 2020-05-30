@@ -9,27 +9,29 @@
 
 import Foundation
 
+/// Protocol for moving typed BitEmebeddable values in and out of their ByteCoder storage.
 protocol CoderAdapter {
     associatedtype T: BitEmbeddable
     var coder: ByteCoder { get set }
 
+    /// Encode or decode an object of type T.
+    ///
+    /// Note: ideally, this could be named "wrappedValue" and an extension would automatically fulfill the requirements of any property wrapper struct implementing this protocol.
+    /// I think there is a compiler bug as of Swift 5.2: when instantiating property wrappers, the compiler checks for wrappedValue without considering the extensions in scope. If extensions could provide get/set for "wrappedValue", we nevertheless get the error:
+    ///     Property wrapper type 'ByteArrayDescription.position' does not contain a non-static property named 'wrappedValue'
+    /// One can work around this by creating an extension that provides a value with a different name and forward to it,
+    /// achieving code reuse at the cost of some boilerplate.
     var decodedValue: T { get set }
 }
 
 extension CoderAdapter {
-    // I think there is a compiler bug: in instantiating property wrappers, the compiler checks for wrappedValue before filling in the extensions in scope, giving the error:
-    // Property wrapper type 'ByteArrayDescription.position' does not contain a non-static property named 'wrappedValue'
-    // One can work around this by creating an extension that provides a value with a different name and forward to it:
     var decodedValue /*wrappedValue*/: T {
         get {
             T(rawValue: T.RawValue(truncatingIfNeeded: coder.wideRepresentation))!
         }
         set {
-            // for signed quantities, we deal with sign extension here, where we have
-            // access to T.RawValue's width. N.B. RawValue is always unsigned, so
-            // the truncatingIfNeeded functions won't extend sign for us.
-            let raw = coder.extendingSign(of: UInt(truncatingIfNeeded: newValue.rawValue), fromPosition: T.RawValue.bitWidth)
-            coder.wideRepresentation = raw
+            let zeroPadded = UInt(truncatingIfNeeded: newValue.rawValue)
+            coder.wideRepresentation = coder.extendingSignIfNeeded(of: zeroPadded, fromPosition: T.RawValue.bitWidth)
         }
     }
 }

@@ -68,7 +68,7 @@ class MultiByteCoder: ByteCoder {
         UInt(1) << (UInt.bitWidth - 1)
     }
 
-    func extendingSign(of rawValue: UInt, fromPosition bit: Int) -> UInt {
+    func extendingSignIfNeeded(of rawValue: UInt, fromPosition bit: Int) -> UInt {
         guard isSigned else {
             return rawValue
         }
@@ -102,7 +102,7 @@ class MultiByteCoder: ByteCoder {
 
                 msb = 7
             }
-            return extendingSign(of: value, fromPosition: encodedWidth)
+            return extendingSignIfNeeded(of: value, fromPosition: encodedWidth)
         }
         set {
             var remaining = newValue
