@@ -16,9 +16,15 @@ protocol CoderAdapter {
 
     /// Encode or decode an object of type T.
     ///
-    /// Note: ideally, this could be named "wrappedValue" and an extension would automatically fulfill the requirements of any property wrapper struct implementing this protocol.
-    /// I think there is a compiler bug as of Swift 5.2: when instantiating property wrappers, the compiler checks for wrappedValue without considering the extensions in scope. If extensions could provide get/set for "wrappedValue", we nevertheless get the error:
+    /// - Note: ideally, this could be named "wrappedValue" and an extension would automatically fulfill
+    /// the requirements of any property wrapper struct implementing this protocol.
+    ///
+    /// - Bug: I think there is a compiler bug as of Swift 5.2: when instantiating property wrappers, the
+    /// compiler checks for wrappedValue without considering the extensions in scope. If extensions could
+    /// provide get/set for "wrappedValue", we nevertheless get the error:
+    ///
     ///     Property wrapper type 'ByteArrayDescription.position' does not contain a non-static property named 'wrappedValue'
+    ///
     /// One can work around this by creating an extension that provides a value with a different name and forward to it,
     /// achieving code reuse at the cost of some boilerplate.
     var decodedValue: T { get set }

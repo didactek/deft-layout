@@ -44,7 +44,7 @@ public class AssembledMessage {
     /// assigned at least some value before super.init is called, the `freezeAndRotateStorage` can be
     /// placed in the layout superclass. This pattern is provided when deriving from `BitStorageCore`.
     ///
-    /// Important: This uses a static pool and is not thread-safe. Initialize in turn each object sharing AssembledMessages
+    /// - Important: This uses a static pool and is not thread-safe. Initialize in turn each object sharing AssembledMessages
     /// with its properties.
     static func storageBuildInProgress(/*coder _: ByteCoder*/) -> AssembledMessage {
         return _storage

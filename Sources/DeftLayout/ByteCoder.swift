@@ -11,7 +11,8 @@ import Foundation
 
 /// Requirements for accessing widened/raw representations of values.
 ///
-/// Implementors of this protocol are expected to store the data in a more compact form than a UInt. For instance, a `MultiByteCoder` stores only a specified number of bits in a particular offset in a Data byte array.
+/// Implementors of this protocol are expected to store the data in a more compact form than a UInt.
+/// For instance, a `MultiByteCoder` stores only a specified number of bits in a particular offset in a Data byte array.
 protocol ByteCoder {
     /// Extract raw value from its store and represent as a full-width UInt.
     var wideRepresentation: UInt { get set }
