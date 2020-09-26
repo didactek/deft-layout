@@ -41,8 +41,7 @@ extension CoderAdapter {
             T(rawValue: T.RawValue(truncatingIfNeeded: coder.wideRepresentation))!
         }
         set {
-            let zeroPadded = UInt(truncatingIfNeeded: newValue.rawValue)
-            coder.wideRepresentation = coder.extendingSignIfNeeded(of: zeroPadded, fromPosition: T.RawValue.bitWidth)
+            coder.wideRepresentation = UInt(truncatingIfNeeded: newValue.rawValue)
         }
     }
 }

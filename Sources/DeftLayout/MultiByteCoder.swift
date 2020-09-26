@@ -80,24 +80,19 @@ class MultiByteCoder: ByteCoder {
         return ~valueMask
     }
 
-
     private var signBitMaskedWide: UInt {
         UInt(1) << (UInt.bitWidth - 1)
     }
 
-    // FIXME: are there two sign-extensions here? One for widening prior to truncating?
-    // Is that necessary, or is it only to avoid concerns about negative values not triggering warnings?
-    // It would be better to remove fromPosition parameter?
+    /// Fill in sign bits if the stored version in its shortened form is negative.
     ///
-    ///
-    /// - Parameter of: Raw bits
-    /// - Parameter fromPosition: Index of the sign bit to extend.
-    func extendingSignIfNeeded(of rawValue: UnpackedRawValue, fromPosition bit: Int) -> UnpackedRawValue {
+    /// - Parameter of: Value with just the storage bits set that may need sign extension.
+    private func extendingSignIfNeeded(of rawValue: UnpackedRawValue) -> UnpackedRawValue {
         guard isSigned else {
             return rawValue
         }
 
-        let signBitMaskedRaw = UnpackedRawValue(1) << (bit - 1)
+        let signBitMaskedRaw = UnpackedRawValue(1) << (encodedWidth - 1)
 
         if rawValue & signBitMaskedRaw == 0 {
             // non-negative: no work to do.
@@ -126,7 +121,7 @@ class MultiByteCoder: ByteCoder {
 
                 msb = 7
             }
-            return extendingSignIfNeeded(of: value, fromPosition: encodedWidth)
+            return extendingSignIfNeeded(of: value)
         }
         set {
             var remaining = newValue
@@ -136,7 +131,8 @@ class MultiByteCoder: ByteCoder {
                 remaining = remaining & ~excessMask  // clear the sign extension that won't appear in the encoded value
             }
 
-            assert(remaining == (remaining & ~excessMask), "Raw value \(newValue) (possibly sign-contracted to \(remaining) will not fit starting in byte \(mostSignificantByteIndex + 1), bit \(msb)")
+            // FIXME: check for overflow, including negative numbers
+//            assert(remaining == (remaining & ~excessMask), "Raw value \(newValue) (possibly sign-contracted to \(remaining) will not fit starting in byte \(mostSignificantByteIndex + 1), bit \(msb)")
 
 
             // grow storage:
