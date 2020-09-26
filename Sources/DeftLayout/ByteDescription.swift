@@ -9,6 +9,18 @@
 
 import Foundation
 
+/// Base class for packing bits into a single storage byte. Provides `Position` property wrappers for
+/// locating `BitEmbeddeble` properties within the byte.
+///
+/// Example:
+///
+///     class FlagAndSmallValue: ByteDescription {
+///        @Position(bit: 7)
+///        var flag = false
+///
+///        @Position(msb: 4, lsb: 0)
+///        var smallValue = UInt8(0b1_1111) // max value of all 5 bits set
+///     }
 open class ByteDescription: BitStorageCore {
     public override init() {
         super.init()
@@ -16,16 +28,8 @@ open class ByteDescription: BitStorageCore {
 
     static var byteWidth: Int = 1
 
-    public struct PositionOptions: OptionSet {
-        public let rawValue: Int
 
-        public init(rawValue: Int) {
-            self.rawValue = rawValue
-        }
-
-        static let extendNegativeBit = PositionOptions(rawValue: 1 << 0)
-    }
-
+    /// Map a `BitEmbeddable` property's into a bit or range of bits within the managed storage byte.
     @propertyWrapper
     public struct Position<T: BitEmbeddable>: CoderAdapter {
         var coder: ByteCoder
@@ -36,7 +40,10 @@ open class ByteDescription: BitStorageCore {
         }
 
         // FIXME: either simplify this or factor common init work into protocol
-        public init(wrappedValue: T, msb: Int, lsb: Int, _ options: PositionOptions = []) {
+        /// Map a `BitEmbeddable` property's into a range of bits within the managed storage byte.
+        /// - Parameter msb: Indexed position of the property's most significant bit when stored in the managed byte.
+        /// - Parameter lsb: Indexed position of the property's least significant bit when stored in the managed byte.
+        public init(wrappedValue: T, msb: Int, lsb: Int, signed: Bool = false) {
             assert(msb >= 0 && msb < (ByteDescription.byteWidth * 8))
             assert(lsb >= 0 && lsb < (ByteDescription.byteWidth * 8))
             assert(msb >= lsb)
@@ -46,13 +53,14 @@ open class ByteDescription: BitStorageCore {
 
             self.coder = try! MultiByteCoder(significantByte: msbDistanceToEnd, msb: msbOffset,
                                              minorByte: lsbDistanceToEnd, lsb: lsbOffset,
-                                             signed: options.contains(.extendNegativeBit),
+                                             signed: signed,
                                              storedIn: AssembledMessage.storageBuildInProgress(),
                                              littleEndian: false
             )
             self.wrappedValue = wrappedValue
         }
 
+        /// Map a `BitRepresentable` property into a single bit of the managed storage byte.
         public init(wrappedValue: T, bit: Int) {
             self.init(wrappedValue: wrappedValue, msb: bit, lsb: bit)
         }

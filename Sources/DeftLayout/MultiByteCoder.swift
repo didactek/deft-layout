@@ -9,6 +9,15 @@
 
 import Foundation
 
+/// Encoding that packs a ByteCoder.UnpackedRawValue in and out of a range of bits of a multi-byte array.
+///
+/// When packing, the value is truncated to the bits available. When unpacking, the value is padded with zeros
+/// unless it is a signed value and the most significant packed bit is set, in which case the value is sign-extended
+/// (packed with ones).
+///
+/// Outside the range of bits designated for storing the value, the storage is unchanged by MultiByteCoder.
+/// Storage may be (and is typically) shared by different coder instances responsible for interpreting different
+/// segments of the underlying storage.
 class MultiByteCoder: ByteCoder {
     private let storage: AssembledMessage
     private let mostSignificantByteIndex: Int
@@ -18,6 +27,14 @@ class MultiByteCoder: ByteCoder {
     private let isSigned: Bool
     private let littleEndian: Bool
 
+    /// - Parameters:
+    ///  - significantByte: Index of the byte within storage bytes that should hold the most significant bit.
+    ///  - msb: Index (0...7) of the most significant bit of the `signifcantByte`.
+    ///  - minorByte: Index of the byte within storage bytes that should hold the least significant bit.
+    ///  - lsb: Index (0...7) of the least significant bit of the `minorByte`.
+    ///  - signed: Value may be negative, and should be sign-extended when expanding.
+    ///  - storedIn: Underlying storage for the packed value.
+    ///  - littleEndian: If the least significant *byte* should come before the most significant in storage.
     init(significantByte: Int, msb: Int, minorByte: Int, lsb: Int, signed: Bool, storedIn: AssembledMessage, littleEndian: Bool = false) throws {
         guard significantByte >= 0 else { throw BitfieldRangeError.badByteIndex }
         guard minorByte >= 0 else { throw BitfieldRangeError.badByteIndex }
@@ -68,12 +85,19 @@ class MultiByteCoder: ByteCoder {
         UInt(1) << (UInt.bitWidth - 1)
     }
 
-    func extendingSignIfNeeded(of rawValue: UInt, fromPosition bit: Int) -> UInt {
+    // FIXME: are there two sign-extensions here? One for widening prior to truncating?
+    // Is that necessary, or is it only to avoid concerns about negative values not triggering warnings?
+    // It would be better to remove fromPosition parameter?
+    ///
+    ///
+    /// - Parameter of: Raw bits
+    /// - Parameter fromPosition: Index of the sign bit to extend.
+    func extendingSignIfNeeded(of rawValue: UnpackedRawValue, fromPosition bit: Int) -> UnpackedRawValue {
         guard isSigned else {
             return rawValue
         }
 
-        let signBitMaskedRaw = UInt(1) << (bit - 1)
+        let signBitMaskedRaw = UnpackedRawValue(1) << (bit - 1)
 
         if rawValue & signBitMaskedRaw == 0 {
             // non-negative: no work to do.
@@ -84,9 +108,9 @@ class MultiByteCoder: ByteCoder {
         return rawValue | excessMask
     }
 
-    var wideRepresentation: UInt {
+    var wideRepresentation: UnpackedRawValue {
         get {
-            var value = UInt(0)
+            var value = UnpackedRawValue(0)
 
             var lsb = 0
             var msb = self.msb
@@ -98,7 +122,7 @@ class MultiByteCoder: ByteCoder {
                 value <<= bitsToAddThisPass
                 let mask = UInt8(truncatingIfNeeded: (0b1 << bitsToAddThisPass) - 1)
                 let bitsRead = (storage.bytes[index] >> lsb) & mask
-                value |= UInt(bitsRead)
+                value |= UnpackedRawValue(bitsRead)
 
                 msb = 7
             }

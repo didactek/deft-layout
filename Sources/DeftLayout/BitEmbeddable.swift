@@ -10,11 +10,22 @@
 import Foundation
 
 
+/// Protocol to move a value in and out of a set of bits.
 ///
-/// - Note: protocol is a subset of RawRepresentable so enums can comply just by mentioning this protocol.
+/// Required for `CoderAdapter` to connect a type to a `ByteCoder`.
+///
+/// - Note: To make it easy to encode enums in Layout classes, we strive to avoid requiring *any*
+/// extensions to enums. Enums that specify an encoding conform to `RawRepresentable`,
+/// which provides all needed functionality. Identifying a minimal subset of `RawRepresentable`'s
+/// needed functionality makes it less work to adapt additional types.
 public protocol BitEmbeddable {
+    /// Integer wide enough to hold any representation of this type. The representation should
+    /// be reasonably compact and use bits of RawValue starting from the least signficant.
     associatedtype RawValue: FixedWidthInteger
+    /// Convert from a RawValue into an instance of the conforming type, if the bits in rawValue
+    /// can be interpreted as a valid object.
     init?(rawValue: RawValue)
+    /// Encode the object using an integer, using the lowest necessary bits of RawValue.
     var rawValue: RawValue { get }
 }
 

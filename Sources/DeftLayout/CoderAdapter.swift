@@ -9,12 +9,17 @@
 
 import Foundation
 
-/// Protocol for moving typed BitEmebeddable values in and out of their ByteCoder storage.
-protocol CoderAdapter {
+/// Protocol outlining procedure for moving typed BitEmebeddable values in and out of their ByteCoder storage.
+///
+/// When adopted by Position property wrappers, the implementation in the default extension does most of
+/// the work managing the wrappedValue. The property wrapper needs only to set up the `ByteCoder` to use.
+protocol CoderAdapter { // FIXME: would a different name be better? "CompressedStore"? "CodedStore"? "StoreWrapper"?
     associatedtype T: BitEmbeddable
+
+    /// Coder to use to move value in and out of storage.
     var coder: ByteCoder { get set }
 
-    /// Encode or decode an object of type T.
+    /// Move an object of type T in or out of storage using the coder.
     ///
     /// - Note: ideally, this could be named "wrappedValue" and an extension would automatically fulfill
     /// the requirements of any property wrapper struct implementing this protocol.
@@ -23,11 +28,11 @@ protocol CoderAdapter {
     /// compiler checks for wrappedValue without considering the extensions in scope. If extensions could
     /// provide get/set for "wrappedValue", we nevertheless get the error:
     ///
-    ///     Property wrapper type 'ByteArrayDescription.position' does not contain a non-static property named 'wrappedValue'
+    ///      Property wrapper type 'ByteArrayDescription.position' does not contain a non-static property named 'wrappedValue'
     ///
-    /// One can work around this by creating an extension that provides a value with a different name and forward to it,
-    /// achieving code reuse at the cost of some boilerplate.
-    var decodedValue: T { get set }
+    /// One can work around this by creating an extension that provides a get/set property with a different
+    /// name from `wrappedValue` and forward to it, achieving code reuse at the cost of some boilerplate.
+    var decodedValue /*wrappedValue*/: T { get set }
 }
 
 extension CoderAdapter {

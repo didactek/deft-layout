@@ -9,20 +9,23 @@
 
 import Foundation
 
-/// Requirements for accessing widened/raw representations of values.
+/// Requirements for retreiving and storing a value while treating it as a widened, raw representation.
 ///
 /// Implementors of this protocol are expected to store the data in a more compact form than a UInt.
-/// For instance, a `MultiByteCoder` stores only a specified number of bits in a particular offset in a Data byte array.
+/// See`MultiByteCoder`, which stores a specified number of bits into set of bits in a Data byte array.
 protocol ByteCoder {
-    /// Extract raw value from its store and represent as a full-width UInt.
-    var wideRepresentation: UInt { get set }
+    typealias UnpackedRawValue = UInt
 
-    /// Extend the sign bit of a BitEmbeddable value **if appropriate for the intemediate type**.
+    /// Value in the store expanded and represenedt as a full-width UInt.
+    /// Writing to this value should update the underlying store; read should extract from the store.
+    var wideRepresentation: UnpackedRawValue { get set }
+
+    /// Extend the sign bit of a BitEmbeddable value **if appropriate for the intermediate type**.
     ///
     /// This is used when converting a BitEmbeddable RawValue type to a UInt for storage or conversion.
     /// If the ByteCoder is encoding an unsigned type, then this will return the rawValue passed to it.
     /// If the ByteCoder encodes a signed type and the fromPosition bit is set, the sign is extended to the width of the UInt.
-    func extendingSignIfNeeded(of rawValue: UInt, fromPosition bit: Int) -> UInt
+    func extendingSignIfNeeded(of rawValue: UnpackedRawValue, fromPosition bit: Int) -> UnpackedRawValue
 }
 
 enum BitfieldRangeError: Error {
