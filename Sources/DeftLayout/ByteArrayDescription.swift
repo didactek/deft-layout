@@ -14,16 +14,6 @@ open class ByteArrayDescription: BitStorageCore {
         super.init()
     }
 
-    public struct PositionOptions: OptionSet {
-        public let rawValue: Int
-
-        public init(rawValue: Int) {
-            self.rawValue = rawValue
-        }
-
-        public static let extendNegativeBit = PositionOptions(rawValue: 1 << 0)
-    }
-
     @propertyWrapper
     public struct Position<T: BitEmbeddable>: CoderAdapter {
         var coder: ByteCoder
@@ -35,22 +25,22 @@ open class ByteArrayDescription: BitStorageCore {
 
         public init(wrappedValue: T, significantByte: Int, msb: Int,
              minorByte: Int, lsb: Int,
-             _ options: PositionOptions = []) {
+             extendNegativeBit: Bool = false) {
 
             self.coder = try! MultiByteCoder(significantByte: significantByte - 1, msb: msb,
                                              minorByte: minorByte - 1, lsb: lsb,
-                                             signed: options.contains(.extendNegativeBit),
+                                             signed: extendNegativeBit,
                                              storedIn: AssembledMessage.storageBuildInProgress())
             self.wrappedValue = wrappedValue
         }
 
-        public init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, _ options: PositionOptions = []) {
+        public init(wrappedValue: T, ofByte: Int, msb: Int, lsb: Int, extendNegativeBit: Bool = false) {
             self.init(wrappedValue: wrappedValue, significantByte: ofByte, msb: msb,
-                      minorByte: ofByte, lsb: lsb, options)
+                      minorByte: ofByte, lsb: lsb, extendNegativeBit: extendNegativeBit)
         }
 
         public init(wrappedValue: T, ofByte: Int, bit: Int) {
-            self.init(wrappedValue: wrappedValue, ofByte: ofByte, msb: bit, lsb: bit, [])
+            self.init(wrappedValue: wrappedValue, ofByte: ofByte, msb: bit, lsb: bit)
         }
 
         // FIXME: additional usage:
