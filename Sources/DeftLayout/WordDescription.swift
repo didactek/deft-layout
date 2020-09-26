@@ -9,7 +9,19 @@
 
 import Foundation
 
-/// Encode a 16-bit, big-endian word (or fractions thereof)
+/// Base class for packing 16 bits into two storage bytes. The storage is considerd big-endian:
+/// the most-significant bits are stored first. Provides `Position` property wrappers for
+/// locating `BitEmbeddeble` properties within the two-byte word.
+///
+/// Example:
+///
+///     class FlagAndMediumValue: WordDescription {
+///        @Position(bit: 15)
+///        var flag = false
+///
+///        @Position(msb: 13, lsb: 3)
+///        var mediumValue = UInt16(0b111_1111_1111) // max value of all 11 bits set
+///     }
 open class WordDescription: BitStorageCore {
     public override init() {
         super.init()
@@ -17,16 +29,7 @@ open class WordDescription: BitStorageCore {
 
     static var byteWidth: Int = 2
 
-    public struct PositionOptions: OptionSet {
-        public let rawValue: Int
-
-        public init(rawValue: Int) {
-            self.rawValue = rawValue
-        }
-
-        public static let extendNegativeBit = PositionOptions(rawValue: 1 << 0)
-    }
-
+    /// Map a `BitEmbeddable` property's into a bit or range of bits within the word of managed storage..
     @propertyWrapper
     public struct Position<T: BitEmbeddable>: CoderAdapter {
         var coder: ByteCoder
@@ -36,7 +39,10 @@ open class WordDescription: BitStorageCore {
             set { decodedValue = newValue }
         }
 
-        public init(wrappedValue: T, msb: Int, lsb: Int, _ options: PositionOptions = []) {
+        /// Map a `BitEmbeddable` property's into a range of bits within the managed storage byte.
+        /// - Parameter msb: Indexed position of the property's most significant bit when stored in the managed bytes.
+        /// - Parameter lsb: Indexed position of the property's least significant bit when stored in the managed bytes.
+        public init(wrappedValue: T, msb: Int, lsb: Int, extendNegativeBit: Bool = false) {
             assert(msb >= 0 && msb < (WordDescription.byteWidth * 8))
             assert(lsb >= 0 && lsb < (WordDescription.byteWidth * 8))
             assert(msb >= lsb)
@@ -46,7 +52,7 @@ open class WordDescription: BitStorageCore {
 
             self.coder = try! MultiByteCoder(significantByte: WordDescription.byteWidth - msbDistanceToEnd - 1, msb: msbOffset,
                                              minorByte: WordDescription.byteWidth - lsbDistanceToEnd - 1, lsb: lsbOffset,
-                                             signed: options.contains(.extendNegativeBit),
+                                             signed: extendNegativeBit,
                                              storedIn: AssembledMessage.storageBuildInProgress(),
                                              littleEndian: false
             )
