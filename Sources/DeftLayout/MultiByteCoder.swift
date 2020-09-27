@@ -27,14 +27,13 @@ class MultiByteCoder: ByteCoder {
     private let isSigned: Bool
     private let littleEndian: Bool
 
-    /// - Parameters:
-    ///  - significantByte: Index of the byte within storage bytes that should hold the most significant bit.
-    ///  - msb: Index (0...7) of the most significant bit of the `signifcantByte`.
-    ///  - minorByte: Index of the byte within storage bytes that should hold the least significant bit.
-    ///  - lsb: Index (0...7) of the least significant bit of the `minorByte`.
-    ///  - signed: Value may be negative, and should be sign-extended when expanding.
-    ///  - storedIn: Underlying storage for the packed value.
-    ///  - littleEndian: If the least significant *byte* should come before the most significant in storage.
+    /// - Parameter significantByte: Index (starting from 0) of the byte within storage bytes that should hold the most significant bit.
+    /// - Parameter msb: Index (0...7) of the most significant bit of the `signifcantByte`.
+    /// - Parameter minorByte: Index (starting from 0) of the byte within storage bytes that should hold the least significant bit.
+    /// - Parameter lsb: Index (0...7) of the least significant bit of the `minorByte`.
+    /// - Parameter signed: Value may be negative, and should be sign-extended when expanding.
+    /// - Parameter storedIn: Underlying storage for the packed value.
+    /// - Parameter littleEndian: If the least significant *byte* should come before the most significant in storage.
     init(significantByte: Int, msb: Int, minorByte: Int, lsb: Int, signed: Bool, storedIn: AssembledMessage, littleEndian: Bool = false) throws {
         guard significantByte >= 0 else { throw BitfieldRangeError.badByteIndex }
         guard minorByte >= 0 else { throw BitfieldRangeError.badByteIndex }
