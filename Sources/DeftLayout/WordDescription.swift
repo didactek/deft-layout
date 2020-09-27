@@ -29,7 +29,7 @@ open class WordDescription: BitStorageCore {
 
     static var byteWidth: Int = 2
 
-    /// Map a `BitEmbeddable` property's into a bit or range of bits within the word of managed storage..
+    /// Help derived classes map a `BitEmbeddable` property into a bit or range of bits within the word of managed storage.
     @propertyWrapper
     public struct Position<T: BitEmbeddable>: CoderAdapter {
         var coder: ByteCoder
@@ -39,7 +39,7 @@ open class WordDescription: BitStorageCore {
             set { decodedValue = newValue }
         }
 
-        /// Map a `BitEmbeddable` property's into a range of bits within the managed storage byte.
+        /// Map a `BitEmbeddable` property into a range of bits within the managed storage.
         /// - Parameter msb: Indexed position of the property's most significant bit when stored in the managed bytes.
         /// - Parameter lsb: Indexed position of the property's least significant bit when stored in the managed bytes.
         public init(wrappedValue: T, msb: Int, lsb: Int, extendNegativeBit: Bool = false) {
@@ -59,6 +59,8 @@ open class WordDescription: BitStorageCore {
             self.wrappedValue = wrappedValue
         }
 
+        /// Map a `BitEmbeddable` property into one bit within the managed storage.
+        /// - Parameter bit: Indexed position of the property when stored in the managed bytes.
         public init(wrappedValue: T, bit: Int) {
             self.init(wrappedValue: wrappedValue, msb: bit, lsb: bit)
         }
