@@ -1,13 +1,13 @@
 # Deft Layout
 
-DEvices from swiFT
-
-
 A library providing typed access to bit-level information packed into Swift Data bytes.
+
+Part of the DEvices from swiFT (Deft) family.
 
 
 ## Goals
-- maximize use and call-site readability
+
+- maximize call-site readability
 - encourage discovery
   - minimize use of external libraries
 - exemplify unit-testable design
