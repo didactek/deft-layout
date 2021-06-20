@@ -38,7 +38,7 @@ protocol CoderAdapter { // FIXME: would a different name be better? "CompressedS
 extension CoderAdapter {
     var decodedValue /*wrappedValue*/: T {
         get {
-            T(rawValue: T.RawValue(truncatingIfNeeded: coder.wideRepresentation))!
+            T(rawValue: T.RawValue(truncatingIfNeeded: coder.wideRepresentation))!  //FIXME: note forced success here: TBD deal with conversion failures gracefully
         }
         set {
             coder.wideRepresentation = UInt(truncatingIfNeeded: newValue.rawValue)

@@ -20,7 +20,7 @@ Swift Package Manager
 
 ## Features
 
-DeftLayout is a framework for mapping values of Swift data types to the bit-level positions
+DeftLayout is a framework for mapping values of Swift types to the bit-level positions
 used in device protocols. It performs the role of functions like pack/unpack in Ruby or Python, or of
 bitwise boolean operations, bitfields, and unions in C.
 

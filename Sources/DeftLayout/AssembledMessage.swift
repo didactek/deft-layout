@@ -10,16 +10,11 @@
 import Foundation
 
 
-/// Shareable representation of an assembled buffer.
+/// Infrastructure for managing a shared representation of a Data buffer.
 ///
 /// Shared by a BitStorageCore instance and its ByteCoder properties.
-/// Individual bits are read/written by `@Position` properties of subclasses of `BitStorageCore`.
-///
-/// - SeeAlso: `BitStorageCore`, `ByteCoder`
 public class AssembledMessage {
-    /// Encoded buffer of UInt8, for sending or receiving a message. Bytes are in wire order.
-    ///
-    /// Interpretation of endian-ness should be done by `ByteCoder`s.
+    /// Encoded buffer of UInt8, for sending or receiving a message.
     public var bytes = Data()
 
     // During their initialization, derived classes copy references to this underlying representation

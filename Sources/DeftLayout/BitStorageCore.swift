@@ -21,23 +21,31 @@ import Foundation
 /// - domain-specific layouts, which introduce properties. Using the property wrappers in the adapter layer,
 /// these properties are exposed as semantic types, but their storage is mapped by the layout adapter
 /// property wrappers into the storage here.
-
-/// - Note: There is some magic here, even though magic should be avoided wherever possible.
-/// `storage` leverages Swift's rules for object initialization: all properties of the derived class must be
-/// given some kind of value before the base class initializer is called.
-///
-/// In collaboration with  `AssembledMessage` and the property wrappers in the middle layer, the
-/// semantic layout classes build their properties first. Each property wrapper asks `AssembledMessage`
-/// for storage, and all are given the same storage (which they will gingerly use only the appropriate parts of).
-///
-/// *After* the properties of the layout classes are set up in this way, the base initializer is called, and it also
-/// goes to the `AssembledMessage` factory to indicate that the storage descriptions are complete, that
-/// it should be given access to the storage, and that any initializers asking for storage in the future should
-/// be directed to something new for themselves.
 open class BitStorageCore {
+    /// Bytes in wire order.
+    ///
+    /// Interpretation of endian-ness should be done by `ByteCoder`s.
+    // FIXME: storage.bytes encourages a LoD violation.
     public let storage: AssembledMessage
 
     init() {
+        // - Note: There is some magic here, even though magic should be avoided wherever possible.
+        //
+        // `storage` leverages Swift's rules for object initialization: all properties
+        // of the derived class must be given some kind of value before the base class
+        // initializer is called.
+        //
+        // During property initialization in the most-derived semantic layout classes,
+        // the @Position property wrapper asks `AssembledMessage` for storage, and
+        // AssembledMessage gives out references to the same storage (which each property
+        // will gingerly use only the appropriate parts of).
+        //
+        // *After* the properties of the layout classes are set up in this way, this
+        // base initializer is called, and the freezeAndRotateStorage call notifies
+        // the `AssembledMessage` factory that the storage descriptions for this object
+        // are complete, that this base class should be given access to the storage,
+        // and that any initializers asking for storage in the future should
+        // be directed to a new AssembledMessage to share amongst themselves.
         storage = AssembledMessage.freezeAndRotateStorage()
     }
 }

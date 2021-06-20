@@ -20,7 +20,9 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "DeftLayout",
-            dependencies: []),
+            dependencies: [],
+            exclude: ["Documentation.docc"]  // FIXME: un-exclude starting with tools version 5.5
+        ),
         .testTarget(
             name: "DeftLayoutTests",
             dependencies: ["DeftLayout"]),
