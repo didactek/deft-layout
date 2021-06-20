@@ -112,7 +112,7 @@ BitEmbeddable conformance to through an extension:
 ## Encoded Access
 
 The base ``BitStorageCore`` class provides access to encoded data via its
-``BitStorageCore/bytes`` property. Data can be both read and written in
+``BitStorageCore/packedBytes`` property. Data can be both read and written in
 its encoded form.
 
 
@@ -126,12 +126,12 @@ result according to the layout:
 
     let result = MCP9808_AmbientTemperatureRegister()
 
-    try! link.writeAndRead(sendFrom: command.bytes, receiveInto: &result.bytes)
+    try! link.writeAndRead(sendFrom: command.packedBytes, receiveInto: &result.packedBytes)
     
     let temperature = Double(result.temperatureSixteenthCelsius) / 16.0
 
 In both the send and the receive, the Data exchanged uses 
-``BitStorageCore/bytes``.
+``BitStorageCore/packedBytes``.
 (Note how the encoded temperatureSixteenthCelsius Int is divided by 2^4
 to reflect the 4 fixed fractional binary bits.)
 

@@ -30,8 +30,8 @@ class WordDescriptionTests: XCTestCase {
         }
 
         let object = WordBit()
-        XCTAssertEqual(object.bytes[0], 0b1000_0000, "MSB first")
-        XCTAssertEqual(object.bytes[1], 0b0100_0000, "LSB first")
+        XCTAssertEqual(object.packedBytes[0], 0b1000_0000, "MSB first")
+        XCTAssertEqual(object.packedBytes[1], 0b0100_0000, "LSB first")
     }
 
     func testStorageWidth() throws {
@@ -44,7 +44,7 @@ class WordDescriptionTests: XCTestCase {
         }
 
         let object = WordBit()
-        XCTAssertEqual(object.bytes.count, 2, "Word should be stored in two bytes")
+        XCTAssertEqual(object.packedBytes.count, 2, "Word should be stored in two bytes")
      }
 
  }

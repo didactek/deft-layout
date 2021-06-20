@@ -32,39 +32,39 @@ class BitStorageUnsignedTests: XCTestCase {
     }
 
     func testInit() throws {
-        XCTAssertEqual(coder.bytes.count, 1, "described bits should fit in single byte")
+        XCTAssertEqual(coder.packedBytes.count, 1, "described bits should fit in single byte")
         XCTAssertEqual(coder.highNibble, 0b1010, "initial value preserved")
         XCTAssertEqual(coder.midWord, 0b00, "initial value preserved")
         XCTAssertEqual(coder.lastWord, 0b11, "initial value preserved")
 
-        XCTAssertEqual(coder.bytes[0],  0b1010_0011, "encoding positions")
+        XCTAssertEqual(coder.packedBytes[0],  0b1010_0011, "encoding positions")
     }
 
     func testWrite() throws {
-        coder.bytes[0] = 0
+        coder.packedBytes[0] = 0
 
         coder.lastWord = 3
-        XCTAssertEqual(coder.bytes[0], 0b0000_0011, "set low bits")
+        XCTAssertEqual(coder.packedBytes[0], 0b0000_0011, "set low bits")
         coder.midWord = 3
-        XCTAssertEqual(coder.bytes[0], 0b0000_1111, "set mid bits")
+        XCTAssertEqual(coder.packedBytes[0], 0b0000_1111, "set mid bits")
         coder.highNibble = 15
-        XCTAssertEqual(coder.bytes[0], 0b1111_1111, "set high bits")
+        XCTAssertEqual(coder.packedBytes[0], 0b1111_1111, "set high bits")
 
         coder.highNibble = 0
-        XCTAssertEqual(coder.bytes[0], 0b0000_1111, "clear high bits")
+        XCTAssertEqual(coder.packedBytes[0], 0b0000_1111, "clear high bits")
         coder.midWord = 0
-        XCTAssertEqual(coder.bytes[0], 0b0000_0011, "clear mid bits")
+        XCTAssertEqual(coder.packedBytes[0], 0b0000_0011, "clear mid bits")
         coder.lastWord = 0
-        XCTAssertEqual(coder.bytes[0], 0b0000_0000, "clear low bits")
+        XCTAssertEqual(coder.packedBytes[0], 0b0000_0000, "clear low bits")
     }
 
     func testReadUnderlying() throws {
-        coder.bytes[0] = 0xff
+        coder.packedBytes[0] = 0xff
         XCTAssertEqual(coder.highNibble, 15, "decoding all underlying bits set")
         XCTAssertEqual(coder.midWord, 3, "decoding all underlying bits set")
         XCTAssertEqual(coder.lastWord, 3, "decoding all underlying bits set")
 
-        coder.bytes[0] = 0x00
+        coder.packedBytes[0] = 0x00
         XCTAssertEqual(coder.highNibble, 0, "decoding all underlying bits clear")
         XCTAssertEqual(coder.midWord, 0, "decoding all underlying bits clear")
         XCTAssertEqual(coder.lastWord, 0, "decoding all underlying bits clear")

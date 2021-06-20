@@ -22,10 +22,10 @@ import Foundation
 /// these properties are exposed as semantic types, but their storage is mapped by the layout adapter
 /// property wrappers into the storage here.
 open class BitStorageCore {
-    /// Bytes in wire order.
+    /// Assembled bytes in wire order.
     ///
     /// Interpretation of endian-ness should be done by `ByteCoder`s.
-    public var bytes: Data {
+    public var packedBytes: Data {
         get { storage.bytes }
         set { storage.bytes = newValue }
     }

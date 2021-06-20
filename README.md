@@ -46,19 +46,17 @@ work than the encoding here.
 
 ### Describe messages
 
-The underlying encoded bytes of the message are represented by an AssembledMessage.
-
-The DeftLayout module provides support for mapping particular bits in AssembledMessage
-Data to properties in a message object.
+The DeftLayout module provides support for mapping particular bits in packedBytes
+to properties in a message object.
 
 
 Typical hierarchy for a mapping class:
 
-  BitStorageCore  // manages the AssembledMessage
+  BitStorageCore  // manages the packed bytes
 
-  [ByteArray]Description // provides @Position wrappers that "make sense" for the representation
+  ByteArray // provides @Position wrappers that "make sense" for the representation
 
-  [UserClass]Layout // uses @Position wrappers to add properties of the message
+  UserLayoutClass // uses @Position wrappers to add properties of the message
 
 
 #### Example: a packed, 5-byte message

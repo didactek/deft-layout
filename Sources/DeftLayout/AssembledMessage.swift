@@ -13,7 +13,7 @@ import Foundation
 /// Infrastructure for managing a shared representation of a Data buffer.
 ///
 /// Shared by a BitStorageCore instance and its ByteCoder properties.
-public class AssembledMessage {
+class AssembledMessage {
     /// Encoded buffer of UInt8, for sending or receiving a message.
     public var bytes = Data()
 
