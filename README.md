@@ -65,7 +65,7 @@ Typical hierarchy for a mapping class:
 
 The TEA5767 radio tuner has only one command, consisting of a write of 5 bytes. Its datasheet
 describes the bytes by byte index and bits within the 8-bit byte. The ByteArrayDescription best
-supports this longer  array with byte-oriented descriptions.
+supports this longer array with byte-oriented descriptions.
 
     class TEA5767_WriteLayout: ByteArrayDescription {
         enum SearchStopLevel: UInt8, BitEmbeddable {

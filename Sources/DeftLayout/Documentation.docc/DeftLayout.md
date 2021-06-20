@@ -53,44 +53,48 @@ storage bits into the raw type before conversion.
 which means enumerations can be mapped if the protocol is included in the
 enum definition.
 
-The '@Position' property wrappers identify a bit or range of bits, plus a
+Here are two examples (from a temperature probe) of enum declarations
+that are made BitEmbeddable through the suggested pattern of giving the enum
+a storage class and declaring BitEmbeddable conformance:
+
+    enum RegisterPointer: UInt8, BitEmbeddable {
+        /// Configuration register (CONFIG)
+        case configuration = 0b0001
+        //...
+        /// Temperature register (TA)
+        case temperature = 0b0101
+    }
+
+    enum LimitFlag: UInt8, BitEmbeddable {
+        case withinLimit = 0
+        case outsideLimit = 1
+    }
+
+The '@Position' property wrappers are applied to the properties in the layout.
+They generate the code to store the property in a bit or range of bits, using a
 strategy for sign extension if needed. The ``ByteDescription/Position`` and
 ``WordDescription/Position`` intializers do not include a byte offset, but
 offer positions for a single bit, or for the position of the largest and
 smallest bit in a range. The ``ByteArrayDescription/Position`` has initializers
 for positions within a byte or that span bytes.
 
-Here is the layout of the (byte-based) command register for a temperature
+Here is the layout of the (byte-based) command register for the temperature
 probe, where the smallest four bits are used to identify a register to read or write:
 
     class MCP9808_PointerRegister: ByteDescription {
-        enum RegisterPointer: UInt8, BitEmbeddable {
-            /// Configuration register (CONFIG)
-            case configuration = 0b0001
-            //...
-            /// Temperature register (TA)
-            case temperature = 0b0101
-        }
         @Position(msb: 3, lsb: 0)
         var command: RegisterPointer = .temperature
     }
 
-Note how `RegisterPointer` conforms to ``BitEmbeddable`` in its definition, allowing
-it to be decorated with @Position in the definition of the property named `command`.
+Note from earlier that `RegisterPointer` conforms to ``BitEmbeddable`` in its
+definition, allowing it to be decorated with @Position in the definition of the
+property named `command`.
 
-Here is the layout of the (word-based) sensor registers returned by the probe:
+The layout of the (word-based) sensor registers returned by the probe
+use BitEmbeddable enums and also a simple Int, which DeftLayout adds
+BitEmbeddable conformance to through an extension:
 
-    /// Current sensor readings: (temperature and alarm states). Read-only.
-    ///
-    /// [datasheet](https://ww1.microchip.com/downloads/en/DeviceDoc/25095A.pdf) REGISTER 5-4
     class MCP9808_AmbientTemperatureRegister: WordDescription {
-        // Datasheet p.24
-
-        enum LimitFlag: UInt8, BitEmbeddable {
-            case withinLimit = 0
-            case outsideLimit = 1
-        }
-
         @Position(bit: 15)
         var AmbientVsCritical: LimitFlag = .withinLimit
 
@@ -100,7 +104,6 @@ Here is the layout of the (word-based) sensor registers returned by the probe:
         @Position(bit: 13)
         var AmbientVsLower: LimitFlag = .withinLimit
 
-
         @Position(msb: 12, lsb: 0, extendNegativeBit: true)
         var temperatureSixteenthCelsius: Int = 0
     }
@@ -109,7 +112,7 @@ Here is the layout of the (word-based) sensor registers returned by the probe:
 ## Encoded Access
 
 The base ``BitStorageCore`` class provides access to encoded data via its
-``BitStorageCore/storage`` property. Data can be both read and written in
+``BitStorageCore/bytes`` property. Data can be both read and written in
 its encoded form.
 
 
@@ -123,12 +126,12 @@ result according to the layout:
 
     let result = MCP9808_AmbientTemperatureRegister()
 
-    try! link.writeAndRead(sendFrom: command.storage.bytes, receiveInto: &result.storage.bytes)
+    try! link.writeAndRead(sendFrom: command.bytes, receiveInto: &result.bytes)
     
     let temperature = Double(result.temperatureSixteenthCelsius) / 16.0
 
 In both the send and the receive, the Data exchanged uses 
-``BitStorageCore/storage``.``AssembledMessage/bytes``.
+``BitStorageCore/bytes``.
 (Note how the encoded temperatureSixteenthCelsius Int is divided by 2^4
 to reflect the 4 fixed fractional binary bits.)
 
@@ -149,7 +152,6 @@ values cause an abort.
 ### Accessing Packed Data
 
 - ``BitStorageCore``
-- ``AssembledMessage``
 
 ### Packed Representations
 
