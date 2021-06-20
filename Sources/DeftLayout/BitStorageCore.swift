@@ -25,8 +25,12 @@ open class BitStorageCore {
     /// Bytes in wire order.
     ///
     /// Interpretation of endian-ness should be done by `ByteCoder`s.
-    // FIXME: storage.bytes encourages a LoD violation.
-    public let storage: AssembledMessage
+    public var bytes: Data {
+        get { storage.bytes }
+        set { storage.bytes = newValue }
+    }
+
+    let storage: AssembledMessage
 
     init() {
         // - Note: There is some magic here, even though magic should be avoided wherever possible.

@@ -39,32 +39,32 @@ class BitStorageSignedTests: XCTestCase {
     func testSignRepresentationAndMask() throws {
         let minusThree: SmallSigned = -3  // 1111_1101 in two's complement
         // msb edge
-        coder.storage.bytes[0] = 0
+        coder.bytes[0] = 0
         coder.highNibble = minusThree // FIXME: all -3 when type allows it
-        XCTAssertEqual(coder.storage.bytes[0], 0b1101_0000, "got: \(String(coder.storage.bytes[0], radix: 2))")
+        XCTAssertEqual(coder.bytes[0], 0b1101_0000, "got: \(String(coder.bytes[0], radix: 2))")
 
-        coder.storage.bytes[0] = 0xff
+        coder.bytes[0] = 0xff
         coder.highNibble = minusThree
-        XCTAssertEqual(coder.storage.bytes[0], 0b1101_1111, "got: \(String(coder.storage.bytes[0], radix: 2))")
+        XCTAssertEqual(coder.bytes[0], 0b1101_1111, "got: \(String(coder.bytes[0], radix: 2))")
 
         // middle of the byte
-        coder.storage.bytes[1] = 0
+        coder.bytes[1] = 0
         coder.midNibble = minusThree
-        XCTAssertEqual(coder.storage.bytes[1], 0b00_1101_00, "got: \(String(coder.storage.bytes[1], radix: 2))")
+        XCTAssertEqual(coder.bytes[1], 0b00_1101_00, "got: \(String(coder.bytes[1], radix: 2))")
 
-        coder.storage.bytes[1] = 0xff
+        coder.bytes[1] = 0xff
         coder.midNibble = minusThree
-        XCTAssertEqual(coder.storage.bytes[1], 0b11_1101_11, "got: \(String(coder.storage.bytes[1], radix: 2))")
+        XCTAssertEqual(coder.bytes[1], 0b11_1101_11, "got: \(String(coder.bytes[1], radix: 2))")
 
 
         // lsb edge
-        coder.storage.bytes[2] = 0
+        coder.bytes[2] = 0
         coder.lowNibble = minusThree
-        XCTAssertEqual(coder.storage.bytes[2], 0b0000_1101, "got: \(String(coder.storage.bytes[2], radix: 2))")
+        XCTAssertEqual(coder.bytes[2], 0b0000_1101, "got: \(String(coder.bytes[2], radix: 2))")
 
-        coder.storage.bytes[2] = 0xff
+        coder.bytes[2] = 0xff
         coder.lowNibble = minusThree
-        XCTAssertEqual(coder.storage.bytes[2], 0b1111_1101, "got: \(String(coder.storage.bytes[2], radix: 2))")
+        XCTAssertEqual(coder.bytes[2], 0b1111_1101, "got: \(String(coder.bytes[2], radix: 2))")
     }
 
     func testSignExtension() throws {
